@@ -1,0 +1,622 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GraphTune</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 22px;
+  background: #10131c;
+  color: #f4f5fa;
+  font-family: Arial, sans-serif;
+}
+.container { max-width: 850px; margin: auto; }
+h1 { color: #75e6a1; margin-bottom: 5px; }
+.subtitle, .hint { color: #aeb6c8; }
+.panel {
+  background: #1b2130;
+  border: 1px solid #30394c;
+  border-radius: 13px;
+  padding: 18px;
+  margin: 16px 0;
+}
+button {
+  background: #287c55;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 15px;
+  margin: 5px 4px 5px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+button:disabled { opacity: .45; cursor: not-allowed; }
+.secondary { background: #39445b; }
+.danger { background: #a13d48; }
+input[type=file] {
+  display: block;
+  max-width: 100%;
+  margin: 9px 0 14px;
+  color: #cbd2df;
+}
+#screenBox {
+  position: relative;
+  width: 100%;
+  background: #080a10;
+  border-radius: 9px;
+  overflow: hidden;
+}
+video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+#selectionCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+#status {
+  font-size: 24px;
+  font-weight: bold;
+  color: #f5d36a;
+  margin: 10px 0;
+}
+.hint { font-size: 13px; line-height: 1.5; }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>GraphTune</h1>
+<p class="subtitle">Convertimos los movimientos del mercado en sonidos.</p>
+
+<section class="panel">
+<h3>1. Conectar pantalla del trading</h3>
+
+<button id="shareBtn">Compartir pantalla</button>
+<button id="stopShareBtn" class="secondary" disabled>
+Desconectar pantalla
+</button>
+
+<p class="hint">
+Compartí la ventana o pantalla donde se reproduce tu gráfico.
+</p>
+
+<div id="screenBox">
+<video id="video" autoplay muted playsinline></video>
+<canvas id="selectionCanvas"></canvas>
+</div>
+
+<p class="hint">
+2. Seleccioná el área del gráfico: mantené presionado el mouse y arrastrá para dibujar un rectángulo sobre la zona donde se mueve la línea.
+</p>
+
+<button id="clearBtn" class="secondary">Borrar selección</button>
+</section>
+
+<section class="panel">
+<h3>3. Estado del gráfico</h3>
+
+<div id="status">ESPERANDO GRÁFICO</div>
+<div id="details">Compartí una pantalla y seleccioná el área del gráfico.</div>
+
+<button id="startBtn" disabled>Comenzar análisis</button>
+<button id="pauseBtn" class="secondary" disabled>Detener análisis</button>
+</section>
+
+<section class="panel">
+<h3>4. Personalizar los sonidos</h3>
+
+<strong>Sonido de subida — Victoria</strong>
+<input id="upFile" type="file" accept="audio/*">
+<button class="secondary" id="testUp">Probar victoria</button>
+
+<hr>
+
+<strong>Sonido de bajada — Drama</strong>
+<input id="downFile" type="file" accept="audio/*">
+<button class="secondary" id="testDown">Probar drama</button>
+
+<hr>
+
+<strong>Sonido de estabilidad — Suspenso</strong>
+<input id="stableFile" type="file" accept="audio/*">
+<button class="secondary" id="testStable">Probar suspenso</button>
+
+<br>
+<button id="muteBtn" class="danger">Silenciar</button>
+
+<p class="hint">
+Podés utilizar tus propios archivos MP3 u otros formatos de audio compatibles.
+</p>
+</section>
+
+</div>
+
+<canvas id="analysisCanvas" style="display:none"></canvas>
+
+<script>
+const video = document.getElementById("video");
+const selectionCanvas = document.getElementById("selectionCanvas");
+const selectionCtx = selectionCanvas.getContext("2d");
+const analysisCanvas = document.getElementById("analysisCanvas");
+const analysisCtx = analysisCanvas.getContext("2d");
+
+const statusEl = document.getElementById("status");
+const detailsEl = document.getElementById("details");
+
+let stream = null;
+let selection = null;
+let drawing = false;
+let startX = 0;
+let startY = 0;
+let analyzing = false;
+let timer = null;
+let samples = [];
+let currentState = "ESTABLE";
+let muted = false;
+
+const audio = {
+  up: new Audio(),
+  down: new Audio(),
+  stable: new Audio()
+};
+
+Object.values(audio).forEach(a => {
+  a.loop = true;
+  a.volume = 0.8;
+});
+
+// -------------------------------
+// SELECCIÓN DEL ÁREA DEL GRÁFICO
+// -------------------------------
+
+function resizeSelectionCanvas() {
+  if (!video.videoWidth) return;
+
+  selectionCanvas.width = video.videoWidth;
+  selectionCanvas.height = video.videoHeight;
+  drawSelection();
+}
+
+function drawSelection() {
+  selectionCtx.clearRect(
+    0, 0, selectionCanvas.width, selectionCanvas.height
+  );
+
+  if (!selection) return;
+
+  selectionCtx.fillStyle = "rgba(0,0,0,0.35)";
+  selectionCtx.fillRect(
+    0, 0, selectionCanvas.width, selectionCanvas.height
+  );
+
+  selectionCtx.clearRect(
+    selection.x, selection.y, selection.w, selection.h
+  );
+
+  selectionCtx.strokeStyle = "#75e6a1";
+  selectionCtx.lineWidth = 3;
+
+  selectionCtx.strokeRect(
+    selection.x, selection.y, selection.w, selection.h
+  );
+}
+
+selectionCanvas.addEventListener("pointerdown", e => {
+  if (!video.videoWidth) return;
+
+  const r = selectionCanvas.getBoundingClientRect();
+
+  const scaleX = selectionCanvas.width / r.width;
+  const scaleY = selectionCanvas.height / r.height;
+
+  startX = (e.clientX - r.left) * scaleX;
+  startY = (e.clientY - r.top) * scaleY;
+
+  drawing = true;
+
+  selection = {
+    x: startX,
+    y: startY,
+    w: 0,
+    h: 0
+  };
+
+  selectionCanvas.setPointerCapture(e.pointerId);
+  drawSelection();
+});
+
+selectionCanvas.addEventListener("pointermove", e => {
+  if (!drawing) return;
+
+  const r = selectionCanvas.getBoundingClientRect();
+
+  const scaleX = selectionCanvas.width / r.width;
+  const scaleY = selectionCanvas.height / r.height;
+
+  const x = (e.clientX - r.left) * scaleX;
+  const y = (e.clientY - r.top) * scaleY;
+
+  selection = {
+    x: Math.min(startX, x),
+    y: Math.min(startY, y),
+    w: Math.abs(x - startX),
+    h: Math.abs(y - startY)
+  };
+
+  drawSelection();
+});
+
+selectionCanvas.addEventListener("pointerup", () => {
+  drawing = false;
+
+  if (selection && selection.w > 10 && selection.h > 10) {
+    document.getElementById("startBtn").disabled = false;
+    detailsEl.textContent =
+      "Área seleccionada. Ya podés comenzar el análisis.";
+  } else {
+    selection = null;
+    drawSelection();
+  }
+});
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  stopAnalysis();
+  selection = null;
+  drawSelection();
+
+  document.getElementById("startBtn").disabled = true;
+
+  detailsEl.textContent =
+    "Seleccioná nuevamente el área del gráfico.";
+});
+
+// -------------------------------
+// COMPARTIR PANTALLA
+// -------------------------------
+
+document.getElementById("shareBtn").addEventListener("click", async () => {
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: false
+    });
+
+    video.srcObject = stream;
+
+    document.getElementById("stopShareBtn").disabled = false;
+
+    video.onloadedmetadata = async () => {
+      await video.play();
+      resizeSelectionCanvas();
+
+      detailsEl.textContent =
+        "Pantalla conectada. Ahora seleccioná el área del gráfico.";
+    };
+
+    stream.getVideoTracks()[0].addEventListener("ended", () => {
+      stopAnalysis();
+      video.srcObject = null;
+      stream = null;
+
+      selection = null;
+      drawSelection();
+
+      document.getElementById("stopShareBtn").disabled = true;
+      document.getElementById("startBtn").disabled = true;
+
+      statusEl.textContent = "ESPERANDO GRÁFICO";
+      detailsEl.textContent = "La pantalla se desconectó.";
+    });
+
+  } catch (err) {
+    alert("No se pudo compartir la pantalla. Revisá los permisos del navegador.");
+  }
+});
+
+document.getElementById("stopShareBtn").addEventListener("click", () => {
+  stopAnalysis();
+
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+  }
+
+  stream = null;
+  video.srcObject = null;
+  selection = null;
+  drawSelection();
+
+  document.getElementById("stopShareBtn").disabled = true;
+  document.getElementById("startBtn").disabled = true;
+
+  statusEl.textContent = "ESPERANDO GRÁFICO";
+  detailsEl.textContent = "Pantalla desconectada.";
+});
+
+// -------------------------------
+// SONIDOS PERSONALIZADOS
+// -------------------------------
+
+function stateForType(type) {
+  if (type === "up") return "SUBE";
+  if (type === "down") return "BAJA";
+  return "ESTABLE";
+}
+
+function loadAudio(inputId, type) {
+  document.getElementById(inputId).addEventListener("change", e => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    audio[type].src = URL.createObjectURL(file);
+    audio[type].load();
+
+    detailsEl.textContent = "Sonido cargado correctamente.";
+
+    if (analyzing && currentState === stateForType(type) && !muted) {
+      playSound(type);
+    }
+  });
+}
+
+loadAudio("upFile", "up");
+loadAudio("downFile", "down");
+loadAudio("stableFile", "stable");
+
+async function playSound(type) {
+  if (muted || !audio[type].src) return;
+
+  Object.entries(audio).forEach(([key, sound]) => {
+    if (key !== type) {
+      sound.pause();
+      sound.currentTime = 0;
+    }
+  });
+
+  try {
+    await audio[type].play();
+  } catch (e) {
+    detailsEl.textContent =
+      "Tocá un botón de prueba para habilitar el audio.";
+  }
+}
+
+function changeState(state) {
+  if (state === currentState) return;
+
+  currentState = state;
+
+  if (state === "SUBE") {
+    statusEl.textContent = "📈 SUBIENDO";
+  } else if (state === "BAJA") {
+    statusEl.textContent = "📉 BAJANDO";
+  } else {
+    statusEl.textContent = "⏸ ESTABLE";
+  }
+
+  const type =
+    state === "SUBE" ? "up" :
+    state === "BAJA" ? "down" : "stable";
+
+  if (analyzing) {
+    playSound(type);
+  }
+}
+
+// -------------------------------
+// DETECCIÓN DEL PUNTO MÁS RECIENTE
+// -------------------------------
+
+function analyzeFrame() {
+  if (!analyzing || !selection || video.readyState < 2) return;
+
+  const w = 480;
+  const h = 240;
+
+  analysisCanvas.width = w;
+  analysisCanvas.height = h;
+
+  // Recortamos únicamente el área que seleccionaste.
+  analysisCtx.drawImage(
+    video,
+    selection.x,
+    selection.y,
+    selection.w,
+    selection.h,
+    0, 0, w, h
+  );
+
+  const image = analysisCtx.getImageData(0, 0, w, h);
+  const data = image.data;
+
+  // Nos concentramos en el extremo derecho del gráfico.
+  // El resto de la trayectoria no se utiliza para decidir.
+  const rightStart = Math.floor(w * 0.78);
+
+  let latestX = -1;
+  let latestYs = [];
+
+  // Buscamos desde la derecha hacia la izquierda.
+  for (let x = w - 2; x >= rightStart; x -= 2) {
+    const ys = [];
+
+    for (let y = 0; y < h; y += 2) {
+      const i = (y * w + x) * 4;
+
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+
+      const saturation =
+        max === 0 ? 0 : (max - min) / max;
+
+      // Detecta colores visibles de distintos tonos.
+      // También contempla líneas blancas muy brillantes.
+      const coloredPixel =
+        max > 100 && saturation > 0.22;
+
+      const brightPixel =
+        min > 205;
+
+      if (coloredPixel || brightPixel) {
+        ys.push(y);
+      }
+    }
+
+    // Evitamos tomar un único píxel aislado.
+    if (ys.length >= 2) {
+      latestX = x;
+      latestYs = ys;
+      break;
+    }
+  }
+
+  if (latestX === -1) {
+    detailsEl.textContent =
+      "Buscando el movimiento más reciente... Revisá el área seleccionada.";
+    return;
+  }
+
+  latestYs.sort((a, b) => a - b);
+
+  const currentY = latestYs[
+    Math.floor(latestYs.length / 2)
+  ];
+
+  // Guardamos solamente las últimas 4 mediciones.
+  // Las anteriores se descartan automáticamente.
+  samples.push({
+    y: currentY,
+    time: Date.now()
+  });
+
+  if (samples.length > 4) {
+    samples.shift();
+  }
+
+  if (samples.length < 4) {
+    detailsEl.textContent =
+      "Siguiendo el punto más reciente del gráfico...";
+    return;
+  }
+
+  const first = samples[0].y;
+  const last = samples[samples.length - 1].y;
+
+  // En pantalla, un valor Y menor significa que el punto subió.
+  const difference = first - last;
+
+  const threshold = Math.max(2, h * 0.01);
+
+  if (difference > threshold) {
+    changeState("SUBE");
+  } else if (difference < -threshold) {
+    changeState("BAJA");
+  } else {
+    changeState("ESTABLE");
+  }
+
+  detailsEl.textContent =
+    "Siguiendo el movimiento actual | " +
+    "Variación: " + difference.toFixed(1) + " px | " +
+    "Últimas 4 mediciones";
+}
+
+// -------------------------------
+// INICIAR Y DETENER ANÁLISIS
+// -------------------------------
+
+function startAnalysis() {
+  if (!stream || !selection) return;
+
+  stopAnalysis();
+
+  analyzing = true;
+  samples = [];
+  muted = false;
+  currentState = "ESTABLE";
+
+  statusEl.textContent = "ANALIZANDO...";
+  detailsEl.textContent = "Siguiendo el punto más reciente.";
+
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("pauseBtn").disabled = false;
+
+  playSound("stable");
+
+  // Lectura cada 120 milisegundos.
+  timer = setInterval(analyzeFrame, 120);
+}
+
+function stopAnalysis() {
+  analyzing = false;
+
+  if (timer) {
+    clearInterval(timer);
+  }
+
+  timer = null;
+  samples = [];
+
+  Object.values(audio).forEach(a => {
+    a.pause();
+    a.currentTime = 0;
+  });
+
+  document.getElementById("startBtn").disabled = !selection;
+  document.getElementById("pauseBtn").disabled = true;
+}
+
+document.getElementById("startBtn").addEventListener(
+  "click", startAnalysis
+);
+
+document.getElementById("pauseBtn").addEventListener(
+  "click", stopAnalysis
+);
+
+// -------------------------------
+// BOTONES DE PRUEBA Y SILENCIO
+// -------------------------------
+
+document.getElementById("testUp").addEventListener("click", () => {
+  muted = false;
+  playSound("up");
+});
+
+document.getElementById("testDown").addEventListener("click", () => {
+  muted = false;
+  playSound("down");
+});
+
+document.getElementById("testStable").addEventListener("click", () => {
+  muted = false;
+  playSound("stable");
+});
+
+document.getElementById("muteBtn").addEventListener("click", () => {
+  muted = true;
+
+  Object.values(audio).forEach(a => {
+    a.pause();
+    a.currentTime = 0;
+  });
+});
+
+</script>
+</body>
+</html>
