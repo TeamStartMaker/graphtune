@@ -1,789 +1,94 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GraphTune</title>
+<title>GraphTune — Análisis visual de mercado</title>
 <style>
-:root{--bg:#080b18;--panel:#10152a;--panel2:#151b35;--line:#292f55;--purple:#8b3dff;--purple2:#b66cff;--text:#f5f4ff;--muted:#a5accb;--green:#08d987;--red:#ff435f;--yellow:#ffd21c}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 65% -15%,#22204d 0,transparent 38%),var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
-button,select,input{font:inherit}button{border:0;cursor:pointer;transition:.18s ease}button:disabled{opacity:.4;cursor:not-allowed}
-.topbar{height:86px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;background:#0b0e20dd;position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}
-.brand{display:flex;align-items:center;gap:15px}.brand-mark{font-size:39px;color:var(--purple2);text-shadow:0 0 22px #8b3dff}.brand h1{font-size:27px;margin:0;letter-spacing:-1px}.brand h1 span{color:var(--purple2)}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}.top-actions{display:flex;gap:12px;align-items:center;color:#c5c9e9}.avatar{width:42px;height:42px;border:1px solid #51418a;border-radius:50%;display:grid;place-items:center;font-size:20px}
-.layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 86px)}.sidebar{border-right:1px solid var(--line);padding:28px 16px;display:flex;flex-direction:column;gap:10px}.nav-item{padding:15px 17px;border-radius:13px;color:#d4d6ee;text-decoration:none;font-weight:600;display:flex;gap:13px;align-items:center}.nav-item.active{background:linear-gradient(110deg,#7029e9,#5120b6);box-shadow:0 8px 25px #6424c844;color:white}.nav-item:not(.active){background:transparent}.nav-item:not(.active):hover{background:#171c36}.side-logo{margin-top:auto;text-align:center;color:#7437d9;font-size:58px;opacity:.7;padding:20px 0}
-main{padding:28px;max-width:1600px;width:100%;margin:auto}.welcome{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:15px}.welcome h2{font-size:22px;margin:0 0 5px}.welcome p{margin:0;color:var(--muted);font-size:14px}.status-pill{border:1px solid #225b4a;background:#092b26;color:#19e59a;padding:9px 14px;border-radius:30px;font-size:13px;font-weight:700}
-.workspace{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}.card{background:linear-gradient(145deg,#121831,#0e1328);border:1px solid var(--line);border-radius:19px;box-shadow:0 15px 45px #0002}.chart-card{padding:19px}.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}.card-head h3{font-size:16px;margin:0}.controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.trend-toggle{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}.trend-toggle input{accent-color:var(--purple);width:16px;height:16px}.select{background:#171d38;border:1px solid #353b68;color:#f4f2ff;padding:10px 13px;border-radius:10px;outline:none}.primary{background:linear-gradient(110deg,#8538f4,#6327c7);color:#fff;padding:11px 16px;border-radius:10px;font-weight:700;box-shadow:0 5px 18px #762ee944}.primary:hover{filter:brightness(1.13)}.secondary{background:#252b4b;color:#dce0ff;padding:10px 14px;border-radius:10px}.danger{background:#512238;color:#ff9aab;padding:10px 14px;border-radius:10px}
-#screenBox{position:relative;width:100%;min-height:260px;background:#080d1c;border:1px solid #20284b;border-radius:13px;overflow:hidden;display:flex;align-items:center;justify-content:center}video{display:block;width:100%;height:auto;max-height:540px;object-fit:contain}#selectionCanvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none}.empty-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:25px;pointer-events:none;color:var(--muted)}.empty-state .symbol{font-size:40px;color:var(--purple2);margin-bottom:12px}.empty-state strong{color:#f5f4ff;font-size:15px;margin-bottom:6px}.empty-state span{font-size:13px;max-width:360px;line-height:1.5}
-.capture-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.hint{color:var(--muted);font-size:12px;line-height:1.5;margin:12px 0 0}.right-col{display:flex;flex-direction:column;gap:17px}.sound-card{padding:19px}.sound-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--line)}.sound-head h3{font-size:16px;margin:0;display:flex;align-items:center;gap:10px}.sound-icon{font-size:24px;color:var(--purple2)}.toggle{accent-color:var(--purple);width:40px;height:21px}.sound-card h4{font-size:13px;color:#c8cbea;margin:17px 0 10px}.sound-row{display:flex;align-items:center;gap:12px;padding:12px 11px;background:#151b35;border:1px solid #242b50;border-radius:13px;margin:9px 0}.state-dot{width:37px;height:37px;border-radius:50%;display:grid;place-items:center;font-size:19px;font-weight:bold;border:2px solid currentColor}.up{color:var(--green)}.down{color:var(--red)}.stable{color:var(--yellow)}.sound-row strong{flex:1;font-size:14px}.test-sound{background:#252b4b;color:#d8dcff;border-radius:9px;padding:9px 11px}.settings-btn{width:100%;margin-top:13px;background:#242a4b;border:1px solid #393565;color:white;border-radius:12px;padding:13px;font-weight:700}.settings-panel{padding:18px}.settings-panel h3{margin:0 0 13px;font-size:15px}.settings-panel label{font-size:12px;color:var(--muted);display:block;margin:12px 0 6px}.settings-panel input[type=file]{width:100%;font-size:12px;color:#cdd1e9}.settings-line{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #252b4b}.settings-line:last-child{border:0}.settings-line strong{font-size:13px}.settings-line button{font-size:12px}
-.analysis-bar{margin-top:19px;padding:17px 20px;display:flex;align-items:center;gap:17px}.pulse{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--purple2);color:var(--purple2);font-size:28px;box-shadow:0 0 24px #8b3dff55}.analysis-info{flex:1}.analysis-info strong{font-size:16px}.analysis-info p{font-size:12px;color:var(--muted);margin:5px 0 0}#status{font-size:14px;font-weight:800;color:var(--yellow);margin-top:8px;letter-spacing:.5px}#details{font-size:12px;color:var(--muted);margin-top:4px}.analysis-buttons{display:flex;gap:8px;flex-wrap:wrap}
-#analysisCanvas{display:none}
-@media(max-width:1050px){.workspace{grid-template-columns:minmax(0,1fr) 300px}.layout{grid-template-columns:185px minmax(0,1fr)}main{padding:20px}.sidebar{padding:22px 12px}}
-@media(max-width:780px){.topbar{height:72px;padding:0 16px}.brand h1{font-size:22px}.brand p{font-size:11px}.brand-mark{font-size:30px}.layout{display:block}.sidebar{display:none}main{padding:16px}.welcome{align-items:flex-start}.workspace{grid-template-columns:1fr}.right-col{display:grid;grid-template-columns:1fr}.analysis-bar{flex-wrap:wrap}.analysis-buttons{width:100%}.analysis-buttons button{flex:1}.chart-card{padding:13px}.card-head{align-items:flex-start;flex-direction:column}#screenBox{min-height:220px}}
-@media(max-width:460px){.top-actions .avatar{display:none}.welcome h2{font-size:19px}.status-pill{font-size:11px;padding:7px 10px}.controls{width:100%}.select{flex:1;min-width:0}.capture-actions button{flex:1}.analysis-bar{padding:14px}.pulse{width:50px;height:50px}.sound-card,.settings-panel{padding:15px}}
+:root{--bg:#080b17;--panel:#11172a;--panel2:#171f36;--line:#293451;--text:#f4f6ff;--muted:#9ba8c5;--purple:#9a5cff;--green:#0ecb81;--red:#f6465d;--yellow:#f5c451}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% -20%,#28204c 0,transparent 38%),var(--bg);color:var(--text);font:15px Inter,Segoe UI,Arial,sans-serif}button,select,input{font:inherit}button{border:0;border-radius:10px;padding:11px 15px;cursor:pointer;font-weight:700}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(110deg,#7b3fe4,#a45dff);color:white}.secondary{background:#252e49;color:#e7eaff;border:1px solid #394666}.danger{background:#492536;color:#ffdce3;border:1px solid #71364b}.wrap{max-width:1450px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}.brand{display:flex;align-items:center;gap:12px}.logo{font-size:32px;color:#bd8aff;text-shadow:0 0 22px #9a5cff}.brand h1{font-size:25px;margin:0}.brand h1 span{color:#bd8aff}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.status{border:1px solid #34415f;background:#131d32;border-radius:30px;padding:8px 12px;color:#cbd5ee;font-size:12px}.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}.card{background:#101629eF;border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 12px 35px #0003}.card h2,.card h3{margin:0 0 13px}.card h2{font-size:17px}.card h3{font-size:15px}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}.stage{position:relative;width:100%;min-height:320px;background:#070a12;border:1px solid #303b57;border-radius:12px;overflow:hidden;display:grid;place-items:center}.stage video{display:block;width:100%;height:auto;max-height:72vh;object-fit:contain}.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}.placeholder{max-width:420px;text-align:center;padding:30px;color:var(--muted);line-height:1.6}.placeholder strong{display:block;color:var(--text);font-size:18px;margin-bottom:8px}.capture{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.hint{font-size:12px;line-height:1.5;color:var(--muted);margin:11px 0 0}.metric{padding:13px;background:var(--panel2);border:1px solid #2b3855;border-radius:12px;margin-bottom:10px}.metric small{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.metric strong{font-size:17px}.state{font-weight:800;letter-spacing:.5px}.state.up{color:var(--green)}.state.down{color:var(--red)}.state.side{color:var(--yellow)}.setting{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #26314a;font-size:13px}.setting:last-child{border:0}.setting select,.setting input{max-width:130px;background:#202a43;color:white;border:1px solid #3a4867;border-radius:8px;padding:7px}.check{display:flex;gap:8px;align-items:center;color:#dbe2f6;font-size:13px;margin:12px 0}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.notice{font-size:12px;line-height:1.55;color:#d9c9ff;background:#241a3a;border:1px solid #49346d;padding:11px;border-radius:10px;margin-top:14px}.footer{color:#77839f;font-size:11px;text-align:center;margin:20px 0 4px}.hidden{display:none!important}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.wrap{padding:14px}.stage{min-height:240px}.top{align-items:flex-start}.status{max-width:145px;text-align:center}}
 </style>
 </head>
-
 <body>
-<header class="topbar">
-  <div class="brand"><div class="brand-mark">◖)))</div><div><h1>Graph<span>Tune</span></h1><p>Sentí el mercado con sonido</p></div></div>
-  <div class="top-actions"><span>◉</span><div class="avatar">●</div></div>
-</header>
-<div class="layout">
-  <aside class="sidebar">
-    <a class="nav-item active" href="#inicio">⌂ <span>Inicio</span></a>
-    <a class="nav-item" href="#grafico">◖)) <span>Gráfico</span></a>
-    <a class="nav-item" href="#ajustes">⚙ <span>Ajustes</span></a>
-    <a class="nav-item" href="#acerca">ⓘ <span>Acerca de</span></a>
-    <div class="side-logo">◖)))</div>
-  </aside>
-  <main id="inicio">
-    <div class="welcome"><div><h2>Tu mercado, en sonido</h2><p>Conectá tu gráfico y dejá que GraphTune traduzca sus movimientos.</p></div><div class="status-pill">● Sistema listo</div></div>
-    <div class="workspace">
-      <section class="card chart-card" id="grafico">
-        <div class="card-head"><h3>Gráfico compartido</h3><div class="controls">
-          <select class="select" id="analysisMode" aria-label="Tipo de gráfico"><option value="line">Modo línea</option><option value="candles">Velas japonesas</option></select><label class="trend-toggle"><input id="trendToggle" type="checkbox" checked> Líneas de tendencia</label>
-        </div></div>
-        <div id="screenBox">
-          <video id="video" autoplay muted playsinline></video><canvas id="selectionCanvas"></canvas>
-          <div class="empty-state" id="emptyState"><div class="symbol">◖)))</div><strong>Conectá tu pantalla de trading</strong><span>Compartí la ventana donde tenés el gráfico. Después seleccioná con el mouse la zona de la línea o de las velas.</span></div>
-        </div>
-        <div class="capture-actions"><button id="shareBtn" class="primary">＋ Compartir pantalla</button><button id="stopShareBtn" class="secondary" disabled>Desconectar</button><button id="clearBtn" class="secondary">Borrar selección</button></div>
-        <p class="hint">Las líneas automáticas estiman soportes y resistencias uniendo pivotes visibles (máximos y mínimos locales). Es una lectura experimental del área compartida: no reemplaza datos OHLC ni recupera períodos que no estén en pantalla.</p>
-      </section>
-      <aside class="right-col">
-        <section class="card sound-card">
-          <div class="sound-head"><h3><span class="sound-icon">◖)))</span> Sonido del gráfico</h3><input class="toggle" id="soundToggle" type="checkbox" checked aria-label="Activar sonido"></div>
-          <h4>SONIDOS AL CAMBIAR EL MOVIMIENTO</h4>
-          <div class="sound-row"><span class="state-dot up">↗</span><strong>Sube</strong><button class="test-sound" id="testUp" title="Probar sonido">◖))</button></div>
-          <div class="sound-row"><span class="state-dot down">↘</span><strong>Baja</strong><button class="test-sound" id="testDown" title="Probar sonido">◖))</button></div>
-          <div class="sound-row"><span class="state-dot stable">Ⅱ</span><strong>Estable</strong><button class="test-sound" id="testStable" title="Probar sonido">◖))</button></div>
-          <button class="settings-btn" id="showSettings">⚙ Configuración de sonidos</button>
-        </section>
-        <section class="card settings-panel" id="ajustes" hidden>
-          <h3>Personalizar sonidos</h3>
-          <div class="settings-line"><strong>Sonido de subida</strong><button class="secondary" id="chooseUp">Elegir archivo</button></div><input id="upFile" type="file" accept="audio/*">
-          <div class="settings-line"><strong>Sonido de bajada</strong><button class="secondary" id="chooseDown">Elegir archivo</button></div><input id="downFile" type="file" accept="audio/*">
-          <div class="settings-line"><strong>Sonido estable</strong><button class="secondary" id="chooseStable">Elegir archivo</button></div><input id="stableFile" type="file" accept="audio/*">
-          <button id="muteBtn" class="danger" style="width:100%;margin-top:13px">Silenciar sonidos</button>
-          <label>Tiempo mínimo entre alertas (segundos)</label><select id="cooldownSelect" class="select" style="width:100%"><option value="1">1 segundo</option><option value="2" selected>2 segundos</option><option value="4">4 segundos</option><option value="6">6 segundos</option></select><p class="hint">Cada sonido se reproduce una sola vez cuando se confirma un cambio de estado. No queda en loop.</p>
-        </section>
-      </aside>
-    </div>
-    <section class="card analysis-bar">
-      <div class="pulse">◖)))</div><div class="analysis-info"><strong>Sonido del mercado</strong><div id="status">ESPERANDO GRÁFICO</div><div id="details">Compartí una pantalla y seleccioná el área del gráfico.</div></div>
-      <div class="analysis-buttons"><button id="startBtn" class="primary" disabled>▶ Iniciar</button><button id="pauseBtn" class="secondary" disabled>Ⅱ Detener</button></div>
-    </section>
-  </main>
+<div class="wrap">
+<header class="top"><div class="brand"><div class="logo">◖)))</div><div><h1>Graph<span>Tune</span></h1><p>Escuchá los cambios del mercado</p></div></div><div class="status" id="connection">● Sin pantalla conectada</div></header>
+<div class="grid">
+<section class="card">
+<h2>Gráfico de mercado</h2>
+<div class="toolbar"><button class="primary" id="share">＋ Compartir pantalla</button><button class="secondary" id="select" disabled>Seleccionar zona de precios</button><button class="secondary" id="analyze" disabled>▶ Analizar</button><button class="danger" id="stop" disabled>Detener</button></div>
+<div class="stage" id="stage"><video id="video" autoplay muted playsinline class="hidden"></video><canvas id="overlay" class="hidden"></canvas><div class="placeholder" id="placeholder"><strong>Conectá tu plataforma de trading</strong>Compartí la ventana o pantalla donde está el gráfico. Después seleccioná solamente el área de las velas, sin incluir el volumen de abajo.</div></div>
+<div class="capture"><button class="secondary" id="clearLines" disabled>Limpiar líneas</button><button class="secondary" id="showLines" disabled>Ocultar líneas</button></div>
+<div class="legend"><span><i class="dot" style="background:var(--green)"></i>Vela alcista</span><span><i class="dot" style="background:var(--red)"></i>Vela bajista</span><span><i class="dot" style="background:#b58aff"></i>Línea de máximos</span><span><i class="dot" style="background:#55c8ff"></i>Línea de mínimos</span></div>
+<p class="hint">Consejo: seleccioná únicamente el área donde se dibujan las velas y sus mechas. Evitá incluir volumen, paneles laterales, indicadores y botones.</p>
+</section>
+<aside>
+<section class="card">
+<h2>Lectura de tendencia</h2>
+<div class="metric"><small>ESTRUCTURA DETECTADA</small><strong class="state side" id="trend">ESPERANDO DATOS</strong></div>
+<div class="metric"><small>VELAS RECONOCIDAS</small><strong id="candleCount">0</strong></div>
+<div class="metric"><small>PIVOTES CONFIRMADOS</small><strong id="pivotCount">0</strong></div>
+<div class="metric"><small>ESTADO DEL ANÁLISIS</small><strong id="detail" style="font-size:13px">Compartí y seleccioná un gráfico.</strong></div>
+</section>
+<section class="card" style="margin-top:16px">
+<h3>Configuración</h3>
+<div class="setting"><label for="sensitivity">Sensibilidad</label><select id="sensitivity"><option value="1">Alta</option><option value="2" selected>Media</option><option value="3">Baja</option></select></div>
+<div class="setting"><label for="cooldown">Pausa entre alertas</label><select id="cooldown"><option value="2">2 segundos</option><option value="4" selected>4 segundos</option><option value="6">6 segundos</option><option value="10">10 segundos</option></select></div>
+<label class="check"><input type="checkbox" id="soundOn" checked> Activar sonidos</label>
+<label class="check"><input type="checkbox" id="trendAlerts" checked> Avisar al cambiar tendencia</label>
+<div class="setting"><label for="upSound">Sonido alcista</label><input type="file" id="upSound" accept="audio/*"></div>
+<div class="setting"><label for="downSound">Sonido bajista</label><input type="file" id="downSound" accept="audio/*"></div>
+<div class="setting"><label for="sideSound">Sonido lateral</label><input type="file" id="sideSound" accept="audio/*"></div>
+<div class="capture"><button class="secondary" id="testSound">Probar sonido</button></div>
+<div class="notice">Las líneas son estimaciones visuales. No son señales de compra o venta ni predicciones. La detección depende de los colores, el zoom y la calidad de la captura.</div>
+</section>
+</aside>
 </div>
-<canvas id="analysisCanvas"></canvas>
+<div class="footer">GraphTune · Prototipo experimental de análisis visual</div>
+</div>
+<canvas id="work" class="hidden"></canvas>
 <script>
-const video = document.getElementById("video");
-const selectionCanvas = document.getElementById("selectionCanvas");
-const selectionCtx = selectionCanvas.getContext("2d");
-const analysisCanvas = document.getElementById("analysisCanvas");
-const analysisCtx = analysisCanvas.getContext("2d");
-
-const statusEl = document.getElementById("status");
-const detailsEl = document.getElementById("details");
-
-let stream = null;
-let selection = null;
-let drawing = false;
-let startX = 0;
-let startY = 0;
-let analyzing = false;
-let timer = null;
-let samples = [];
-let currentState = "ESTABLE";
-let muted = false;
-let lastSoundAt = 0;
-let trendLines = null;
-let lastTrendUpdate = 0;
-
-const audio = {
-  up: new Audio(),
-  down: new Audio(),
-  stable: new Audio()
-};
-
-Object.values(audio).forEach(a => {
-  a.loop = false;
-  a.volume = 0.8;
-});
-
-// -------------------------------
-// SELECCIÓN DEL ÁREA DEL GRÁFICO
-// -------------------------------
-
-function resizeSelectionCanvas() {
-  if (!video.videoWidth) return;
-
-  selectionCanvas.width = video.videoWidth;
-  selectionCanvas.height = video.videoHeight;
-  drawSelection();
-}
-
-function drawSelection() {
-  selectionCtx.clearRect(
-    0, 0, selectionCanvas.width, selectionCanvas.height
-  );
-
-  if (!selection) return;
-
-  selectionCtx.fillStyle = "rgba(0,0,0,0.35)";
-  selectionCtx.fillRect(
-    0, 0, selectionCanvas.width, selectionCanvas.height
-  );
-
-  selectionCtx.clearRect(
-    selection.x, selection.y, selection.w, selection.h
-  );
-
-  selectionCtx.strokeStyle = "#75e6a1";
-  selectionCtx.lineWidth = 3;
-
-  selectionCtx.strokeRect(
-    selection.x, selection.y, selection.w, selection.h
-  );
-
-  // Líneas estimadas de soporte/resistencia sobre los pivotes visibles.
-  if (trendLines && document.getElementById("trendToggle")?.checked) {
-    const drawTrend = (points, color) => {
-      if (!points || points.length < 2) return;
-      const a = points[points.length - 2];
-      const b = points[points.length - 1];
-      const x1 = selection.x + (a.x / 480) * selection.w;
-      const y1 = selection.y + (a.y / 240) * selection.h;
-      const x2 = selection.x + (b.x / 480) * selection.w;
-      const y2 = selection.y + (b.y / 240) * selection.h;
-      selectionCtx.strokeStyle = color;
-      selectionCtx.lineWidth = Math.max(2, selectionCanvas.width / 700);
-      selectionCtx.setLineDash([10, 7]);
-      selectionCtx.beginPath();
-      selectionCtx.moveTo(x1, y1);
-      selectionCtx.lineTo(x2, y2);
-      selectionCtx.stroke();
-      selectionCtx.setLineDash([]);
-    };
-    drawTrend(trendLines.highs, "#ffb84d");
-    drawTrend(trendLines.lows, "#32dca0");
-  }
-}
-
-selectionCanvas.addEventListener("pointerdown", e => {
-  if (!video.videoWidth) return;
-
-  const r = selectionCanvas.getBoundingClientRect();
-
-  const scaleX = selectionCanvas.width / r.width;
-  const scaleY = selectionCanvas.height / r.height;
-
-  startX = (e.clientX - r.left) * scaleX;
-  startY = (e.clientY - r.top) * scaleY;
-
-  drawing = true;
-
-  selection = {
-    x: startX,
-    y: startY,
-    w: 0,
-    h: 0
-  };
-
-  selectionCanvas.setPointerCapture(e.pointerId);
-  drawSelection();
-});
-
-selectionCanvas.addEventListener("pointermove", e => {
-  if (!drawing) return;
-
-  const r = selectionCanvas.getBoundingClientRect();
-
-  const scaleX = selectionCanvas.width / r.width;
-  const scaleY = selectionCanvas.height / r.height;
-
-  const x = (e.clientX - r.left) * scaleX;
-  const y = (e.clientY - r.top) * scaleY;
-
-  selection = {
-    x: Math.min(startX, x),
-    y: Math.min(startY, y),
-    w: Math.abs(x - startX),
-    h: Math.abs(y - startY)
-  };
-
-  drawSelection();
-});
-
-selectionCanvas.addEventListener("pointerup", () => {
-  drawing = false;
-
-  if (selection && selection.w > 10 && selection.h > 10) {
-    document.getElementById("startBtn").disabled = false;
-    detailsEl.textContent =
-      "Área seleccionada. Ya podés comenzar el análisis.";
-  } else {
-    selection = null;
-    drawSelection();
-  }
-});
-
-document.getElementById("clearBtn").addEventListener("click", () => {
-  stopAnalysis();
-  selection = null;
-  drawSelection();
-
-  document.getElementById("startBtn").disabled = true;
-
-  detailsEl.textContent =
-    "Seleccioná nuevamente el área del gráfico.";
-});
-
-// -------------------------------
-// COMPARTIR PANTALLA
-// -------------------------------
-
-document.getElementById("shareBtn").addEventListener("click", async () => {
-  try {
-    stream = await navigator.mediaDevices.getDisplayMedia({
-      video: true,
-      audio: false
-    });
-
-    video.srcObject = stream;
-    document.getElementById("emptyState").style.display = "none";
-
-    document.getElementById("stopShareBtn").disabled = false;
-
-    video.onloadedmetadata = async () => {
-      await video.play();
-      resizeSelectionCanvas();
-
-      detailsEl.textContent =
-        "Pantalla conectada. Ahora seleccioná el área del gráfico.";
-    };
-
-    stream.getVideoTracks()[0].addEventListener("ended", () => {
-      stopAnalysis();
-      video.srcObject = null;
-      document.getElementById("emptyState").style.display = "flex";
-      stream = null;
-
-      selection = null;
-      drawSelection();
-
-      document.getElementById("stopShareBtn").disabled = true;
-      document.getElementById("startBtn").disabled = true;
-
-      statusEl.textContent = "ESPERANDO GRÁFICO";
-      detailsEl.textContent = "La pantalla se desconectó.";
-    });
-
-  } catch (err) {
-    alert("No se pudo compartir la pantalla. Revisá los permisos del navegador.");
-  }
-});
-
-document.getElementById("stopShareBtn").addEventListener("click", () => {
-  stopAnalysis();
-
-  if (stream) {
-    stream.getTracks().forEach(t => t.stop());
-  }
-
-  stream = null;
-  video.srcObject = null;
-  document.getElementById("emptyState").style.display = "flex";
-  selection = null;
-  drawSelection();
-
-  document.getElementById("stopShareBtn").disabled = true;
-  document.getElementById("startBtn").disabled = true;
-
-  statusEl.textContent = "ESPERANDO GRÁFICO";
-  detailsEl.textContent = "Pantalla desconectada.";
-});
-
-// -------------------------------
-// SONIDOS PERSONALIZADOS
-// -------------------------------
-
-function stateForType(type) {
-  if (type === "up") return "SUBE";
-  if (type === "down") return "BAJA";
-  return "ESTABLE";
-}
-
-function loadAudio(inputId, type) {
-  document.getElementById(inputId).addEventListener("change", e => {
-    const file = e.target.files[0];
-
-    if (!file) return;
-
-    audio[type].src = URL.createObjectURL(file);
-    audio[type].load();
-
-    detailsEl.textContent = "Sonido cargado correctamente.";
-
-    if (analyzing && currentState === stateForType(type) && !muted) {
-      playSound(type);
-    }
-  });
-}
-
-loadAudio("upFile", "up");
-loadAudio("downFile", "down");
-loadAudio("stableFile", "stable");
-
-async function playSound(type) {
-  if (muted || !audio[type].src) return;
-  const now = Date.now();
-  const cooldown = Number(document.getElementById("cooldownSelect")?.value || 2) * 1000;
-  if (now - lastSoundAt < cooldown) return;
-  lastSoundAt = now;
-
-  // Reinicia desde el principio y reproduce una sola vez; nunca queda en loop.
-  try {
-    audio[type].pause();
-    audio[type].currentTime = 0;
-    await audio[type].play();
-  } catch (e) {
-    detailsEl.textContent = "Tocá un botón de prueba para habilitar el audio.";
-  }
-}
-
-function changeState(state) {
-  if (state === currentState) return;
-
-  currentState = state;
-
-  if (state === "SUBE") {
-    statusEl.textContent = "📈 SUBIENDO";
-  } else if (state === "BAJA") {
-    statusEl.textContent = "📉 BAJANDO";
-  } else {
-    statusEl.textContent = "⏸ ESTABLE";
-  }
-
-  const type =
-    state === "SUBE" ? "up" :
-    state === "BAJA" ? "down" : "stable";
-
-  if (analyzing) {
-    playSound(type);
-  }
-}
-
-// -------------------------------
-// DETECCIÓN DEL PUNTO MÁS RECIENTE
-// -------------------------------
-
-function analyzeLineFrame() {
-  if (!analyzing || !selection || video.readyState < 2) return;
-
-  const w = 480;
-  const h = 240;
-
-  analysisCanvas.width = w;
-  analysisCanvas.height = h;
-
-  // Recortamos únicamente el área que seleccionaste.
-  analysisCtx.drawImage(
-    video,
-    selection.x,
-    selection.y,
-    selection.w,
-    selection.h,
-    0, 0, w, h
-  );
-
-  const image = analysisCtx.getImageData(0, 0, w, h);
-  const data = image.data;
-
-  // Nos concentramos en el extremo derecho del gráfico.
-  // El resto de la trayectoria no se utiliza para decidir.
-  const rightStart = Math.floor(w * 0.78);
-
-  let latestX = -1;
-  let latestYs = [];
-
-  // Buscamos desde la derecha hacia la izquierda.
-  for (let x = w - 2; x >= rightStart; x -= 2) {
-    const ys = [];
-
-    for (let y = 0; y < h; y += 2) {
-      const i = (y * w + x) * 4;
-
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-
-      const saturation =
-        max === 0 ? 0 : (max - min) / max;
-
-      // Detecta colores visibles de distintos tonos.
-      // También contempla líneas blancas muy brillantes.
-      const coloredPixel =
-        max > 100 && saturation > 0.22;
-
-      const brightPixel =
-        min > 205;
-
-      if (coloredPixel || brightPixel) {
-        ys.push(y);
-      }
-    }
-
-    // Evitamos tomar un único píxel aislado.
-    if (ys.length >= 2) {
-      latestX = x;
-      latestYs = ys;
-      break;
-    }
-  }
-
-  if (latestX === -1) {
-    detailsEl.textContent =
-      "Buscando el movimiento más reciente... Revisá el área seleccionada.";
-    return;
-  }
-
-  latestYs.sort((a, b) => a - b);
-
-  const currentY = latestYs[
-    Math.floor(latestYs.length / 2)
-  ];
-
-  // Guardamos solamente las últimas 4 mediciones.
-  // Las anteriores se descartan automáticamente.
-  samples.push({
-    y: currentY,
-    time: Date.now()
-  });
-
-  if (samples.length > 4) {
-    samples.shift();
-  }
-
-  if (samples.length < 4) {
-    detailsEl.textContent =
-      "Siguiendo el punto más reciente del gráfico...";
-    return;
-  }
-
-  const first = samples[0].y;
-  const last = samples[samples.length - 1].y;
-
-  // En pantalla, un valor Y menor significa que el punto subió.
-  const difference = first - last;
-
-  const threshold = Math.max(2, h * 0.01);
-
-  if (difference > threshold) {
-    changeState("SUBE");
-  } else if (difference < -threshold) {
-    changeState("BAJA");
-  } else {
-    changeState("ESTABLE");
-  }
-
-  detailsEl.textContent =
-    "Siguiendo el movimiento actual | " +
-    "Variación: " + difference.toFixed(1) + " px | " +
-    "Últimas 4 mediciones";
-}
-
-// -------------------------------
-// DETECCIÓN EXPERIMENTAL DE VELAS JAPONESAS
-// -------------------------------
-
-// Busca píxeles verdes y rojos. Funciona mejor con velas de colores
-// bien diferenciados y un fondo que no tenga muchos elementos de esos tonos.
-function analyzeCandlesFrame() {
-  if (!analyzing || !selection || video.readyState < 2) return;
-
-  const w = 480;
-  const h = 240;
-  analysisCanvas.width = w;
-  analysisCanvas.height = h;
-
-  analysisCtx.drawImage(
-    video, selection.x, selection.y, selection.w, selection.h,
-    0, 0, w, h
-  );
-
-  const data = analysisCtx.getImageData(0, 0, w, h).data;
-  const columns = [];
-
-  for (let x = 0; x < w; x += 1) {
-    let green = 0;
-    let red = 0;
-    let greenYs = [];
-    let redYs = [];
-
-    for (let y = 0; y < h; y += 1) {
-      const i = (y * w + x) * 4;
-      const r = data[i], g = data[i + 1], b = data[i + 2];
-
-      // Umbrales orientativos para velas verdes/rojas habituales.
-      if (g > 75 && g > r * 1.22 && g > b * 1.05) {
-        green++;
-        greenYs.push(y);
-      } else if (r > 85 && r > g * 1.22 && r > b * 1.12) {
-        red++;
-        redYs.push(y);
-      }
-    }
-
-    const total = green + red;
-    columns.push({
-      x,
-      green,
-      red,
-      total,
-      color: green > red ? "up" : red > green ? "down" : null,
-      ys: green > red ? greenYs : red > green ? redYs : []
-    });
-  }
-
-  // Agrupa columnas cercanas que parecen pertenecer a una misma vela.
-  const groups = [];
-  let group = null;
-  for (const col of columns) {
-    if (col.total >= 2) {
-      if (!group || col.x - group.lastX > 4) {
-        group = { startX: col.x, lastX: col.x, green: 0, red: 0, ys: [], columns: 0 };
-        groups.push(group);
-      }
-      group.lastX = col.x;
-      group.green += col.green;
-      group.red += col.red;
-      group.ys.push(...col.ys);
-      group.columns++;
-    } else if (group && col.x - group.lastX > 4) {
-      group = null;
-    }
-  }
-
-  // Ignora grupos muy pequeños y toma la vela más reciente.
-  const candles = groups.filter(g =>
-    g.columns >= 2 && (g.green + g.red) >= 8 && g.ys.length > 0
-  );
-
-  if (!candles.length) {
-    detailsEl.textContent =
-      "No encuentro velas verdes o rojas. Revisá el área y los colores del gráfico.";
-    return;
-  }
-
-  const latest = candles[candles.length - 1];
-  const direction = latest.green > latest.red ? "up" :
-                    latest.red > latest.green ? "down" : null;
-
-  if (!direction) {
-    detailsEl.textContent =
-      "Encontré una forma, pero no puedo distinguir si la vela es verde o roja.";
-    return;
-  }
-
-  const top = Math.min(...latest.ys);
-  const bottom = Math.max(...latest.ys);
-  const height = bottom - top;
-  const candleName = direction === "up" ? "VELA VERDE" : "VELA ROJA";
-
-  // Mantenemos los tres sonidos originales: subida, bajada y estabilidad.
-  changeState(direction === "up" ? "SUBE" : "BAJA");
-
-  detailsEl.textContent =
-    candleName + " detectada | Altura aproximada: " + height +
-    " px | Velas visibles detectadas: " + candles.length +
-    " | Reconocimiento experimental";
-}
-
-// -------------------------------
-// PIVOTES Y LÍNEAS DE TENDENCIA (ESTIMACIÓN VISUAL)
-// -------------------------------
-// Busca máximos y mínimos locales en la zona visible. No equivale a un
-// análisis OHLC: depende del color, escala y zoom del gráfico compartido.
-function updateTrendLines() {
-  if (!selection || video.readyState < 2 || !document.getElementById("trendToggle").checked) {
-    trendLines = null;
-    drawSelection();
-    return;
-  }
-  const w = 480, h = 240;
-  analysisCanvas.width = w; analysisCanvas.height = h;
-  analysisCtx.drawImage(video, selection.x, selection.y, selection.w, selection.h, 0, 0, w, h);
-  const data = analysisCtx.getImageData(0, 0, w, h).data;
-  const series = [];
-  for (let x = 2; x < w - 2; x += 3) {
-    const ys = [];
-    for (let y = 4; y < h - 4; y += 2) {
-      const i = (y * w + x) * 4;
-      const r=data[i], g=data[i+1], b=data[i+2];
-      const max=Math.max(r,g,b), min=Math.min(r,g,b);
-      const sat=max ? (max-min)/max : 0;
-      const colored=max>95 && sat>0.28;
-      const bright=r>205 && g>205 && b>205;
-      if (colored || bright) ys.push(y);
-    }
-    if (ys.length) {
-      ys.sort((a,b)=>a-b);
-      series.push({x, y:ys[Math.floor(ys.length/2)]});
-    }
-  }
-  const highs=[], lows=[];
-  const radius=4;
-  for (let i=radius; i<series.length-radius; i++) {
-    const p=series[i];
-    const near=series.slice(i-radius,i+radius+1).filter((_,j)=>j!==radius);
-    if (near.length < radius*2) continue;
-    if (near.every(q=>p.y<=q.y) && (!highs.length || p.x-highs[highs.length-1].x>18)) highs.push(p);
-    if (near.every(q=>p.y>=q.y) && (!lows.length || p.x-lows[lows.length-1].x>18)) lows.push(p);
-  }
-  trendLines={highs:highs.slice(-2), lows:lows.slice(-2)};
-  drawSelection();
-  if (highs.length>=2 && lows.length>=2) {
-    const hs=highs.slice(-2), ls=lows.slice(-2);
-    const highSlope=(hs[1].y-hs[0].y)/(hs[1].x-hs[0].x);
-    const lowSlope=(ls[1].y-ls[0].y)/(ls[1].x-ls[0].x);
-    let label="Canal lateral o mixto";
-    if (highSlope < -0.035 && lowSlope < -0.035) label="Estructura ascendente estimada";
-    else if (highSlope > 0.035 && lowSlope > 0.035) label="Estructura descendente estimada";
-    detailsEl.textContent = label + " | Pivotes visibles: " + highs.length + " máximos / " + lows.length + " mínimos. Lectura experimental.";
-  }
-}
-
-function analyzeFrame() {
-  if (Date.now() - lastTrendUpdate > 700) { updateTrendLines(); lastTrendUpdate = Date.now(); }
-  const mode = document.getElementById("analysisMode").value;
-  if (mode === "candles") {
-    analyzeCandlesFrame();
-  } else {
-    analyzeLineFrame();
-  }
-}
-
-// -------------------------------
-// INICIAR Y DETENER ANÁLISIS
-// -------------------------------
-
-function startAnalysis() {
-  if (!stream || !selection) return;
-
-  stopAnalysis();
-
-  analyzing = true;
-  samples = [];
-  currentState = "ESTABLE";
-  lastSoundAt = 0;
-
-  const mode = document.getElementById("analysisMode").value;
-  statusEl.textContent = mode === "candles" ? "ANALIZANDO VELAS..." : "ANALIZANDO LÍNEA...";
-  detailsEl.textContent = mode === "candles"
-    ? "Buscando las velas verdes y rojas más recientes."
-    : "Siguiendo el punto más reciente.";
-
-  document.getElementById("startBtn").disabled = true;
-  document.getElementById("pauseBtn").disabled = false;
-
-  // No emitimos un sonido al iniciar: solo al detectar un cambio confirmado.
-
-  // Lectura cada 120 milisegundos.
-  timer = setInterval(analyzeFrame, 120);
-}
-
-function stopAnalysis() {
-  analyzing = false;
-
-  if (timer) {
-    clearInterval(timer);
-  }
-
-  timer = null;
-  samples = [];
-  trendLines = null;
-  drawSelection();
-
-  Object.values(audio).forEach(a => {
-    a.pause();
-    a.currentTime = 0;
-  });
-
-  document.getElementById("startBtn").disabled = !selection;
-  document.getElementById("pauseBtn").disabled = true;
-}
-
-document.getElementById("startBtn").addEventListener(
-  "click", startAnalysis
-);
-
-document.getElementById("pauseBtn").addEventListener(
-  "click", stopAnalysis
-);
-
-document.getElementById("trendToggle").addEventListener("change", () => { trendLines = null; drawSelection(); if (analyzing) updateTrendLines(); });
-
-document.getElementById("analysisMode").addEventListener("change", () => {
-  samples = [];
-  if (analyzing) {
-    statusEl.textContent =
-      document.getElementById("analysisMode").value === "candles"
-        ? "ANALIZANDO VELAS..." : "ANALIZANDO LÍNEA...";
-    detailsEl.textContent = "Modo cambiado. Reiniciando la lectura del gráfico.";
-  }
-});
-
-// Panel simple de configuración y control general de sonido.
-document.getElementById("showSettings").addEventListener("click", () => {
-  const panel = document.getElementById("ajustes");
-  panel.hidden = !panel.hidden;
-  document.getElementById("showSettings").textContent = panel.hidden ? "⚙ Configuración de sonidos" : "Cerrar configuración";
-});
-["up", "down", "stable"].forEach(type => {
-  document.getElementById("choose" + type[0].toUpperCase() + type.slice(1)).addEventListener("click", () => document.getElementById(type + "File").click());
-});
-document.getElementById("soundToggle").addEventListener("change", e => {
-  muted = !e.target.checked;
-  if (muted) Object.values(audio).forEach(a => { a.pause(); a.currentTime = 0; });
-});
-
-// -------------------------------
-// BOTONES DE PRUEBA Y SILENCIO
-// -------------------------------
-
-document.getElementById("testUp").addEventListener("click", () => {
-  muted = false; lastSoundAt = 0;
-  document.getElementById("soundToggle").checked = true;
-  playSound("up");
-});
-
-document.getElementById("testDown").addEventListener("click", () => {
-  muted = false; lastSoundAt = 0;
-  document.getElementById("soundToggle").checked = true;
-  playSound("down");
-});
-
-document.getElementById("testStable").addEventListener("click", () => {
-  muted = false; lastSoundAt = 0;
-  document.getElementById("soundToggle").checked = true;
-  playSound("stable");
-});
-
-document.getElementById("muteBtn").addEventListener("click", () => {
-  muted = true;
-  document.getElementById("soundToggle").checked = false;
-
-  Object.values(audio).forEach(a => {
-    a.pause();
-    a.currentTime = 0;
-  });
-});
-
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const video=$('video'), stage=$('stage'), overlay=$('overlay'), ctx=overlay.getContext('2d');
+const work=$('work'), wctx=work.getContext('2d',{willReadFrequently:true});
+let stream=null, selecting=false, drawing=false, start=null, rect=null, running=false, loop=null, hideLines=false;
+let lastTrend='UNKNOWN', lastAlert=0, audioFiles={up:null,down:null,side:null}, lastAnalysis=null;
+const colors={up:'#b58aff',down:'#55c8ff'};
+function status(s){$('connection').textContent=s}
+function fitOverlay(){if(!video.videoWidth)return;const r=video.getBoundingClientRect();overlay.width=video.videoWidth;overlay.height=video.videoHeight;overlay.style.width=r.width+'px';overlay.style.height=r.height+'px';overlay.style.left=(video.offsetLeft)+'px';overlay.style.top=(video.offsetTop)+'px';drawOverlay()}
+function pointerPos(e){const r=overlay.getBoundingClientRect();return {x:(e.clientX-r.left)*overlay.width/r.width,y:(e.clientY-r.top)*overlay.height/r.height}}
+$('share').onclick=async()=>{try{stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:30},audio:false});video.srcObject=stream;video.classList.remove('hidden');$('placeholder').classList.add('hidden');await video.play();status('● Pantalla conectada');$('select').disabled=false;stream.getVideoTracks()[0].addEventListener('ended',stopAll);fitOverlay();}catch(e){status('No se pudo compartir');alert('No se pudo iniciar la captura. Revisá los permisos del navegador.')}};
+$('select').onclick=()=>{if(!stream)return;selecting=true;rect=null;stopAnalysis();overlay.classList.remove('hidden');overlay.style.cursor='crosshair';$('detail').textContent='Arrastrá para seleccionar el área de las velas.';drawOverlay()};
+overlay.addEventListener('pointerdown',e=>{if(!selecting)return;drawing=true;start=pointerPos(e);rect={x:start.x,y:start.y,w:0,h:0};overlay.setPointerCapture(e.pointerId);drawOverlay()});
+overlay.addEventListener('pointermove',e=>{if(!drawing)return;const p=pointerPos(e);rect={x:Math.min(start.x,p.x),y:Math.min(start.y,p.y),w:Math.abs(p.x-start.x),h:Math.abs(p.y-start.y)};drawOverlay()});
+overlay.addEventListener('pointerup',()=>{if(!drawing)return;drawing=false;selecting=false;overlay.style.cursor='default';if(!rect||rect.w<40||rect.h<40){rect=null;$('detail').textContent='Selección demasiado pequeña. Intentá de nuevo.';return} $('analyze').disabled=false;$('clearLines').disabled=false;$('showLines').disabled=false;$('detail').textContent='Zona seleccionada. Ya podés analizar.';drawOverlay()});
+function drawOverlay(){if(!overlay.width)return;ctx.clearRect(0,0,overlay.width,overlay.height);if(rect){ctx.save();ctx.strokeStyle='#a66aff';ctx.lineWidth=Math.max(2,overlay.width/900);ctx.setLineDash([8,5]);ctx.strokeRect(rect.x,rect.y,rect.w,rect.h);ctx.fillStyle='#9a5cff20';ctx.fillRect(rect.x,rect.y,rect.w,rect.h);ctx.restore()}if(lastAnalysis&&!hideLines)drawTrendLines(lastAnalysis)}
+function stopAnalysis(){running=false;if(loop)clearInterval(loop);loop=null;$('analyze').disabled=!rect;$('stop').disabled=true}
+function stopAll(){stopAnalysis();if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}video.srcObject=null;video.classList.add('hidden');overlay.classList.add('hidden');$('placeholder').classList.remove('hidden');$('select').disabled=true;$('analyze').disabled=true;status('● Sin pantalla conectada');rect=null;lastAnalysis=null;lastTrend='UNKNOWN';$('trend').textContent='ESPERANDO DATOS';$('trend').className='state side';$('detail').textContent='Compartí y seleccioná un gráfico.';$('candleCount').textContent='0';$('pivotCount').textContent='0'}
+$('stop').onclick=stopAnalysis;
+$('clearLines').onclick=()=>{lastAnalysis=null;drawOverlay();$('trend').textContent='LÍNEAS LIMPIADAS'};
+$('showLines').onclick=()=>{hideLines=!hideLines;$('showLines').textContent=hideLines?'Mostrar líneas':'Ocultar líneas';drawOverlay()};
+$('analyze').onclick=()=>{if(!rect||!video.videoWidth)return;running=true;$('analyze').disabled=true;$('stop').disabled=false;$('detail').textContent='Analizando velas…';lastTrend='UNKNOWN';analyzeFrame();loop=setInterval(analyzeFrame,900)};
+function isGreen(r,g,b){return g>r*1.18&&g>b*0.92&&g>75&&g-r>28}
+function isRed(r,g,b){return r>g*1.35&&r>b*1.08&&r>90&&r-g>35}
+function detectCandles(img){const {data,width,height}=img;const cols=new Array(width).fill(null).map(()=>({n:0,green:0,red:0,ys:[]}));
+// Muestreo de color: trabaja exclusivamente dentro de la región de precio seleccionada.
+for(let y=0;y<height;y+=1){for(let x=0;x<width;x+=1){const i=(y*width+x)*4,r=data[i],g=data[i+1],b=data[i+2];if(isGreen(r,g,b)||isRed(r,g,b)){const c=cols[x];c.n++;if(isGreen(r,g,b))c.green++;else c.red++;c.ys.push(y)}}}
+// Agrupa columnas contiguas de color en una vela; tolera pequeños huecos del cuerpo/mecha.
+let runs=[],active=null,gap=0;for(let x=0;x<width;x++){if(cols[x].n>=1){if(!active)active={x0:x,x1:x,green:0,red:0,ys:[],pixels:0};active.x1=x;active.green+=cols[x].green;active.red+=cols[x].red;active.ys.push(...cols[x].ys);active.pixels+=cols[x].n;gap=0}else if(active&&gap<2){gap++}else if(active){runs.push(active);active=null;gap=0}}if(active)runs.push(active);
+const minHeight=Math.max(4,Math.round(height*.018));return runs.filter(c=>c.pixels>=3&&c.ys.length&&Math.max(...c.ys)-Math.min(...c.ys)>=minHeight).map(c=>({x:(c.x0+c.x1)/2,high:Math.min(...c.ys),low:Math.max(...c.ys),bull:c.green>=c.red,weight:c.pixels})).sort((a,b)=>a.x-b.x)}
+function pivots(candles,kind){const sens=Number($('sensitivity').value),radius=sens===1?2:sens===2?3:4,found=[];for(let i=radius;i<candles.length-radius;i++){const v=kind==='high'?candles[i].high:candles[i].low;let extreme=true,localRange=0;for(let j=i-radius;j<=i+radius;j++){if(j===i)continue;const q=kind==='high'?candles[j].high:candles[j].low;if(kind==='high'&&q<v)extreme=false;if(kind==='low'&&q>v)extreme=false;localRange=Math.max(localRange,Math.abs(q-v))}if(extreme&&localRange>=Math.max(2,rect.h*.012)){const prev=found[found.length-1];if(!prev||i-prev.i>=radius){found.push({i,x:candles[i].x,y:v})}else{const old=prev.y;if((kind==='high'&&v<old)||(kind==='low'&&v>old))found[found.length-1]={i,x:candles[i].x,y:v}}}}return found}
+function classify(highs,lows){if(highs.length<2||lows.length<2)return 'UNKNOWN';const h1=highs.at(-2).y,h2=highs.at(-1).y,l1=lows.at(-2).y,l2=lows.at(-1).y;const eps=rect.h*.012;const higherHigh=h2<h1-eps,higherLow=l2<l1-eps,lowerHigh=h2>h1+eps,lowerLow=l2>l1+eps;if(higherHigh&&higherLow)return 'UP';if(lowerHigh&&lowerLow)return 'DOWN';return 'SIDE'}
+function analyzeFrame(){if(!running||!rect||video.readyState<2)return;try{work.width=Math.max(1,Math.floor(rect.w));work.height=Math.max(1,Math.floor(rect.h));wctx.drawImage(video,rect.x,rect.y,rect.w,rect.h,0,0,work.width,work.height);const img=wctx.getImageData(0,0,work.width,work.height);const candles=detectCandles(img);const highs=pivots(candles,'high'),lows=pivots(candles,'low');const trend=classify(highs,lows);lastAnalysis={highs,lows,trend,rect:{...rect},width:work.width,height:work.height};$('candleCount').textContent=String(candles.length);$('pivotCount').textContent=String(highs.length+lows.length);const labels={UP:'TENDENCIA ASCENDENTE',DOWN:'TENDENCIA DESCENDENTE',SIDE:'TENDENCIA LATERAL',UNKNOWN:'DATOS INSUFICIENTES'};$('trend').textContent=labels[trend];$('trend').className='state '+(trend==='UP'?'up':trend==='DOWN'?'down':'side');$('detail').textContent=candles.length<8?'No se reconocen suficientes velas. Revisá la selección y los colores.':highs.length<2||lows.length<2?'Buscando más máximos y mínimos confirmados.':'Estructura actualizada. Revisá visualmente los pivotes.';if(trend!=='UNKNOWN'&&lastTrend!=='UNKNOWN'&&trend!==lastTrend&&$('trendAlerts').checked)alertTrend(trend);if(trend!=='UNKNOWN')lastTrend=trend;drawOverlay()}catch(e){$('detail').textContent='No se pudo leer la selección. Probá seleccionar nuevamente.';console.error(e)}}
+function line(ctx2,pts,color){if(pts.length<2)return;const a=pts.at(-2),b=pts.at(-1);const dx=b.x-a.x;if(Math.abs(dx)<1)return;const slope=(b.y-a.y)/dx;const endX=overlay.width;const endY=b.y+slope*(endX-b.x);ctx2.save();ctx2.strokeStyle=color;ctx2.lineWidth=Math.max(2,overlay.width/650);ctx2.shadowColor=color;ctx2.shadowBlur=8;ctx2.beginPath();ctx2.moveTo(rect.x+a.x,rect.y+a.y);ctx2.lineTo(rect.x+b.x,rect.y+b.y);ctx2.lineTo(Math.min(overlay.width,rect.x+endX),rect.y+endY);ctx2.stroke();ctx2.fillStyle=color;for(const p of [a,b]){ctx2.beginPath();ctx2.arc(rect.x+p.x,rect.y+p.y,4,0,Math.PI*2);ctx2.fill()}ctx2.restore()}
+function drawTrendLines(a){if(!a||!rect)return;line(ctx,a.highs,colors.up);line(ctx,a.lows,colors.down)}
+function alertTrend(t){const now=Date.now(),cool=Number($('cooldown').value)*1000;if(now-lastAlert<cool)return;lastAlert=now;play(t==='UP'?'up':t==='DOWN'?'down':'side')}
+function play(kind){if(!$('soundOn').checked)return;const file=audioFiles[kind];if(file){const a=new Audio(file);a.loop=false;a.volume=.8;a.play().catch(()=>{});return}try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ac=new AC(),osc=ac.createOscillator(),gain=ac.createGain();osc.type='sine';osc.frequency.value=kind==='up'?880:kind==='down'?330:550;gain.gain.setValueAtTime(.0001,ac.currentTime);gain.gain.exponentialRampToValueAtTime(.16,ac.currentTime+.025);gain.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.22);osc.connect(gain);gain.connect(ac.destination);osc.start();osc.stop(ac.currentTime+.23);osc.onended=()=>ac.close()}catch(e){}}
+[['upSound','up'],['downSound','down'],['sideSound','side']].forEach(([id,k])=>$(id).addEventListener('change',e=>{const f=e.target.files[0];if(f)audioFiles[k]=URL.createObjectURL(f)}));$('testSound').onclick=()=>play('side');
+window.addEventListener('resize',()=>{if(video.videoWidth)fitOverlay()});video.addEventListener('loadedmetadata',fitOverlay);
+})();
 </script>
 </body>
 </html>
