@@ -7,6 +7,9 @@
 <style>
 :root{--bg:#080b17;--panel:#11172a;--panel2:#171f36;--line:#293451;--text:#f4f6ff;--muted:#9ba8c5;--purple:#9a5cff;--green:#0ecb81;--red:#f6465d;--yellow:#f5c451}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% -20%,#28204c 0,transparent 38%),var(--bg);color:var(--text);font:15px Inter,Segoe UI,Arial,sans-serif}button,select,input{font:inherit}button{border:0;border-radius:10px;padding:11px 15px;cursor:pointer;font-weight:700}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(110deg,#7b3fe4,#a45dff);color:white}.secondary{background:#252e49;color:#e7eaff;border:1px solid #394666}.danger{background:#492536;color:#ffdce3;border:1px solid #71364b}.wrap{max-width:1450px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}.brand{display:flex;align-items:center;gap:12px}.logo{font-size:32px;color:#bd8aff;text-shadow:0 0 22px #9a5cff}.brand h1{font-size:25px;margin:0}.brand h1 span{color:#bd8aff}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.status{border:1px solid #34415f;background:#131d32;border-radius:30px;padding:8px 12px;color:#cbd5ee;font-size:12px}.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}.card{background:#101629eF;border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 12px 35px #0003}.card h2,.card h3{margin:0 0 13px}.card h2{font-size:17px}.card h3{font-size:15px}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}.stage{position:relative;width:100%;min-height:320px;background:#070a12;border:1px solid #303b57;border-radius:12px;overflow:hidden;display:grid;place-items:center}.stage video{display:block;width:100%;height:auto;max-height:72vh;object-fit:contain}.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}.placeholder{max-width:420px;text-align:center;padding:30px;color:var(--muted);line-height:1.6}.placeholder strong{display:block;color:var(--text);font-size:18px;margin-bottom:8px}.capture{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.hint{font-size:12px;line-height:1.5;color:var(--muted);margin:11px 0 0}.metric{padding:13px;background:var(--panel2);border:1px solid #2b3855;border-radius:12px;margin-bottom:10px}.metric small{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.metric strong{font-size:17px}.state{font-weight:800;letter-spacing:.5px}.state.up{color:var(--green)}.state.down{color:var(--red)}.state.side{color:var(--yellow)}.setting{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #26314a;font-size:13px}.setting:last-child{border:0}.setting select,.setting input{max-width:130px;background:#202a43;color:white;border:1px solid #3a4867;border-radius:8px;padding:7px}.check{display:flex;gap:8px;align-items:center;color:#dbe2f6;font-size:13px;margin:12px 0}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.notice{font-size:12px;line-height:1.55;color:#d9c9ff;background:#241a3a;border:1px solid #49346d;padding:11px;border-radius:10px;margin-top:14px}.footer{color:#77839f;font-size:11px;text-align:center;margin:20px 0 4px}.hidden{display:none!important}
+
+.config-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.config-heading h3{margin:0}.collapse-btn{padding:8px 11px;font-size:12px}.tone-list{display:grid;gap:9px;margin-top:14px}.tone-row{display:grid;grid-template-columns:minmax(125px,1fr) auto;gap:8px;align-items:center;padding:9px;background:#0c1222;border:1px solid #263451;border-radius:12px}.tone-button{display:flex;align-items:center;gap:9px;justify-content:flex-start;text-align:left;background:#202a43;color:#edf1ff;border:1px solid #3a4867;transition:box-shadow .18s,border-color .18s,background .18s}.tone-button:hover{background:#293653}.tone-light{width:9px;height:9px;border-radius:50%;background:#66738e;box-shadow:0 0 0 transparent}.tone-button.playing{background:#263d39;border-color:#21d99a;box-shadow:0 0 8px #21d99a99,0 0 20px #21d99a55}.tone-button.playing .tone-light{background:#35f0a8;box-shadow:0 0 10px #35f0a8,0 0 18px #35f0a8}.tone-button.tone-down.playing{background:#432632;border-color:#ff6379;box-shadow:0 0 8px #ff637999,0 0 20px #ff637955}.tone-button.tone-down.playing .tone-light{background:#ff6379;box-shadow:0 0 10px #ff6379}.tone-button.tone-side.playing{background:#423923;border-color:#f4c75e;box-shadow:0 0 8px #f4c75e99,0 0 20px #f4c75e55}.tone-button.tone-side.playing .tone-light{background:#f4c75e;box-shadow:0 0 10px #f4c75e}.preview-btn{padding:9px 10px;font-size:12px;white-space:nowrap}.file-name{grid-column:1/-1;color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.config-collapsed #configBody{display:none}.config-card{padding:15px}
+
 @media(max-width:900px){.grid{grid-template-columns:1fr}.wrap{padding:14px}.stage{min-height:240px}.top{align-items:flex-start}.status{max-width:145px;text-align:center}}
 </style>
 </head>
@@ -30,17 +33,21 @@
 <div class="metric"><small>PIVOTES CONFIRMADOS</small><strong id="pivotCount">0</strong></div>
 <div class="metric"><small>ESTADO DEL ANÁLISIS</small><strong id="detail" style="font-size:13px">Compartí y seleccioná un gráfico.</strong></div>
 </section>
-<section class="card" style="margin-top:16px">
-<h3>Configuración</h3>
+<section class="card config-card" style="margin-top:16px">
+<div class="config-heading"><h3>Configuración</h3><button class="secondary collapse-btn" id="configToggle" aria-expanded="true">Minimizar −</button></div>
+<div id="configBody">
 <div class="setting"><label for="sensitivity">Sensibilidad</label><select id="sensitivity"><option value="1">Alta</option><option value="2" selected>Media</option><option value="3">Baja</option></select></div>
 <div class="setting"><label for="cooldown">Pausa entre alertas</label><select id="cooldown"><option value="2">2 segundos</option><option value="4" selected>4 segundos</option><option value="6">6 segundos</option><option value="10">10 segundos</option></select></div>
 <label class="check"><input type="checkbox" id="soundOn" checked> Activar sonidos</label>
 <label class="check"><input type="checkbox" id="trendAlerts" checked> Avisar al cambiar tendencia</label>
-<div class="setting"><label for="upSound">Sonido alcista</label><input type="file" id="upSound" accept="audio/*"></div>
-<div class="setting"><label for="downSound">Sonido bajista</label><input type="file" id="downSound" accept="audio/*"></div>
-<div class="setting"><label for="sideSound">Sonido lateral</label><input type="file" id="sideSound" accept="audio/*"></div>
-<div class="capture"><button class="secondary" id="testSound">Probar sonido</button></div>
+<div class="tone-list">
+<div class="tone-row"><button class="tone-button tone-up" id="toneUp" type="button"><span class="tone-light"></span>Tono alcista</button><button class="secondary preview-btn" id="testUp" type="button" title="Probar tono alcista">▶ Probar</button><span class="file-name" id="upName">Sin archivo</span><input type="file" id="upSound" accept="audio/*" hidden></div>
+<div class="tone-row"><button class="tone-button tone-down" id="toneDown" type="button"><span class="tone-light"></span>Tono bajista</button><button class="secondary preview-btn" id="testDown" type="button" title="Probar tono bajista">▶ Probar</button><span class="file-name" id="downName">Sin archivo</span><input type="file" id="downSound" accept="audio/*" hidden></div>
+<div class="tone-row"><button class="tone-button tone-side" id="toneSide" type="button"><span class="tone-light"></span>Tono neutro</button><button class="secondary preview-btn" id="testSide" type="button" title="Probar tono neutro">▶ Probar</button><span class="file-name" id="sideName">Sin archivo</span><input type="file" id="sideSound" accept="audio/*" hidden></div>
+</div>
+<div class="notice">Tocá cada botón de tono para cargar tu archivo de audio. El botón se ilumina mientras ese sonido está reproduciéndose y se apaga al terminar.</div>
 <div class="notice">Las líneas son estimaciones visuales. No son señales de compra o venta ni predicciones. La detección depende de los colores, el zoom y la calidad de la captura.</div>
+</div>
 </section>
 </aside>
 </div>
@@ -55,6 +62,11 @@ const video=$('video'), stage=$('stage'), overlay=$('overlay'), ctx=overlay.getC
 const work=$('work'), wctx=work.getContext('2d',{willReadFrequently:true});
 let stream=null, selecting=false, drawing=false, start=null, rect=null, running=false, loop=null, hideLines=false;
 let lastTrend='UNKNOWN', lastAlert=0, audioFiles={up:null,down:null,side:null}, lastAnalysis=null;
+let audioContext=null, audioUnlocked=false, activeAudio=null, activeTone=null;
+const audioPlayers={up:null,down:null,side:null};
+const toneButtons={up:$('toneUp'),down:$('toneDown'),side:$('toneSide')};
+function setTonePlaying(kind,on){const b=toneButtons[kind];if(b)b.classList.toggle('playing',!!on)}
+function stopActiveAudio(){if(activeAudio){activeAudio.pause();try{activeAudio.currentTime=0}catch(e){}activeAudio=null}if(activeTone){setTonePlaying(activeTone,false);activeTone=null}}
 const colors={up:'#b58aff',down:'#55c8ff'};
 function status(s){$('connection').textContent=s}
 function fitOverlay(){if(!video.videoWidth)return;const r=video.getBoundingClientRect();overlay.width=video.videoWidth;overlay.height=video.videoHeight;overlay.style.width=r.width+'px';overlay.style.height=r.height+'px';overlay.style.left=(video.offsetLeft)+'px';overlay.style.top=(video.offsetTop)+'px';drawOverlay()}
@@ -65,12 +77,15 @@ overlay.addEventListener('pointerdown',e=>{if(!selecting)return;drawing=true;sta
 overlay.addEventListener('pointermove',e=>{if(!drawing)return;const p=pointerPos(e);rect={x:Math.min(start.x,p.x),y:Math.min(start.y,p.y),w:Math.abs(p.x-start.x),h:Math.abs(p.y-start.y)};drawOverlay()});
 overlay.addEventListener('pointerup',()=>{if(!drawing)return;drawing=false;selecting=false;overlay.style.cursor='default';if(!rect||rect.w<40||rect.h<40){rect=null;$('detail').textContent='Selección demasiado pequeña. Intentá de nuevo.';return} $('analyze').disabled=false;$('clearLines').disabled=false;$('showLines').disabled=false;$('detail').textContent='Zona seleccionada. Ya podés analizar.';drawOverlay()});
 function drawOverlay(){if(!overlay.width)return;ctx.clearRect(0,0,overlay.width,overlay.height);if(rect){ctx.save();ctx.strokeStyle='#a66aff';ctx.lineWidth=Math.max(2,overlay.width/900);ctx.setLineDash([8,5]);ctx.strokeRect(rect.x,rect.y,rect.w,rect.h);ctx.fillStyle='#9a5cff20';ctx.fillRect(rect.x,rect.y,rect.w,rect.h);ctx.restore()}if(lastAnalysis&&!hideLines)drawTrendLines(lastAnalysis)}
-function stopAnalysis(){running=false;if(loop)clearInterval(loop);loop=null;$('analyze').disabled=!rect;$('stop').disabled=true}
+function stopAnalysis(){running=false;if(loop)clearInterval(loop);loop=null;stopActiveAudio();$('analyze').disabled=!rect;$('stop').disabled=true}
 function stopAll(){stopAnalysis();if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}video.srcObject=null;video.classList.add('hidden');overlay.classList.add('hidden');$('placeholder').classList.remove('hidden');$('select').disabled=true;$('analyze').disabled=true;status('● Sin pantalla conectada');rect=null;lastAnalysis=null;lastTrend='UNKNOWN';$('trend').textContent='ESPERANDO DATOS';$('trend').className='state side';$('detail').textContent='Compartí y seleccioná un gráfico.';$('candleCount').textContent='0';$('pivotCount').textContent='0'}
 $('stop').onclick=stopAnalysis;
+$('soundOn').addEventListener('change',()=>{if(!$('soundOn').checked)stopActiveAudio();$('detail').textContent=$('soundOn').checked?'Sonidos activados.':'Sonidos desactivados.';});
+$('configToggle').onclick=()=>{const collapsed=$('configBody').classList.toggle('hidden');$('configToggle').textContent=collapsed?'Mostrar configuración +':'Minimizar −';$('configToggle').setAttribute('aria-expanded',String(!collapsed));};
+$('toneUp').onclick=()=>$('upSound').click();$('toneDown').onclick=()=>$('downSound').click();$('toneSide').onclick=()=>$('sideSound').click();
 $('clearLines').onclick=()=>{lastAnalysis=null;drawOverlay();$('trend').textContent='LÍNEAS LIMPIADAS'};
 $('showLines').onclick=()=>{hideLines=!hideLines;$('showLines').textContent=hideLines?'Mostrar líneas':'Ocultar líneas';drawOverlay()};
-$('analyze').onclick=()=>{if(!rect||!video.videoWidth)return;running=true;$('analyze').disabled=true;$('stop').disabled=false;$('detail').textContent='Analizando velas…';lastTrend='UNKNOWN';analyzeFrame();loop=setInterval(analyzeFrame,900)};
+$('analyze').onclick=async()=>{if(!rect||!video.videoWidth)return;await unlockAudio();running=true;$('analyze').disabled=true;$('stop').disabled=false;$('detail').textContent='Analizando velas…';lastTrend='UNKNOWN';analyzeFrame();loop=setInterval(analyzeFrame,900)};
 function isGreen(r,g,b){return g>r*1.18&&g>b*0.92&&g>75&&g-r>28}
 function isRed(r,g,b){return r>g*1.35&&r>b*1.08&&r>90&&r-g>35}
 function detectCandles(img){const {data,width,height}=img;const cols=new Array(width).fill(null).map(()=>({n:0,green:0,red:0,ys:[]}));
@@ -85,8 +100,46 @@ function analyzeFrame(){if(!running||!rect||video.readyState<2)return;try{work.w
 function line(ctx2,pts,color){if(pts.length<2)return;const a=pts.at(-2),b=pts.at(-1);const dx=b.x-a.x;if(Math.abs(dx)<1)return;const slope=(b.y-a.y)/dx;const endX=overlay.width;const endY=b.y+slope*(endX-b.x);ctx2.save();ctx2.strokeStyle=color;ctx2.lineWidth=Math.max(2,overlay.width/650);ctx2.shadowColor=color;ctx2.shadowBlur=8;ctx2.beginPath();ctx2.moveTo(rect.x+a.x,rect.y+a.y);ctx2.lineTo(rect.x+b.x,rect.y+b.y);ctx2.lineTo(Math.min(overlay.width,rect.x+endX),rect.y+endY);ctx2.stroke();ctx2.fillStyle=color;for(const p of [a,b]){ctx2.beginPath();ctx2.arc(rect.x+p.x,rect.y+p.y,4,0,Math.PI*2);ctx2.fill()}ctx2.restore()}
 function drawTrendLines(a){if(!a||!rect)return;line(ctx,a.highs,colors.up);line(ctx,a.lows,colors.down)}
 function alertTrend(t){const now=Date.now(),cool=Number($('cooldown').value)*1000;if(now-lastAlert<cool)return;lastAlert=now;play(t==='UP'?'up':t==='DOWN'?'down':'side')}
-function play(kind){if(!$('soundOn').checked)return;const file=audioFiles[kind];if(file){const a=new Audio(file);a.loop=false;a.volume=.8;a.play().catch(()=>{});return}try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ac=new AC(),osc=ac.createOscillator(),gain=ac.createGain();osc.type='sine';osc.frequency.value=kind==='up'?880:kind==='down'?330:550;gain.gain.setValueAtTime(.0001,ac.currentTime);gain.gain.exponentialRampToValueAtTime(.16,ac.currentTime+.025);gain.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.22);osc.connect(gain);gain.connect(ac.destination);osc.start();osc.stop(ac.currentTime+.23);osc.onended=()=>ac.close()}catch(e){}}
-[['upSound','up'],['downSound','down'],['sideSound','side']].forEach(([id,k])=>$(id).addEventListener('change',e=>{const f=e.target.files[0];if(f)audioFiles[k]=URL.createObjectURL(f)}));$('testSound').onclick=()=>play('side');
+async function unlockAudio(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC){$('detail').textContent='Este navegador no permite generar audio.';return false;}
+    if(!audioContext)audioContext=new AC();
+    if(audioContext.state==='suspended')await audioContext.resume();
+    audioUnlocked=audioContext.state==='running';
+    if(!audioUnlocked)$('detail').textContent='Chrome todavía no habilitó el audio. Volvé a tocar Probar sonido.';
+    return audioUnlocked;
+  }catch(err){$('detail').textContent='No se pudo habilitar el audio: '+(err.message||err);return false;}
+}
+async function play(kind){
+  if(!$('soundOn').checked){$('detail').textContent='Los sonidos están desactivados.';return false;}
+  stopActiveAudio();
+  const file=audioFiles[kind];
+  const label=kind==='up'?'alcista':kind==='down'?'bajista':'neutro';
+  if(file){
+    try{
+      const player=new Audio(file);player.preload='auto';player.volume=.85;
+      activeAudio=player;activeTone=kind;setTonePlaying(kind,true);
+      player.addEventListener('ended',()=>{if(activeAudio===player){setTonePlaying(kind,false);activeAudio=null;activeTone=null;}},{once:true});
+      player.addEventListener('error',()=>{if(activeAudio===player){setTonePlaying(kind,false);activeAudio=null;activeTone=null;}$('detail').textContent='No se pudo reproducir el archivo. Probá con MP3 o WAV.';},{once:true});
+      await player.play();$('detail').textContent='Reproduciendo tono '+label+'.';return true;
+    }catch(err){setTonePlaying(kind,false);activeAudio=null;activeTone=null;$('detail').textContent='No se pudo reproducir el archivo: '+(err.message||err);return false;}
+  }
+  try{
+    const ok=await unlockAudio();if(!ok)return false;
+    const osc=audioContext.createOscillator(),gain=audioContext.createGain();
+    osc.type='sine';osc.frequency.value=kind==='up'?880:kind==='down'?330:550;
+    gain.gain.setValueAtTime(.0001,audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.18,audioContext.currentTime+.025);
+    gain.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+.28);
+    osc.connect(gain);gain.connect(audioContext.destination);activeTone=kind;setTonePlaying(kind,true);
+    osc.onended=()=>{setTonePlaying(kind,false);if(activeTone===kind)activeTone=null;};
+    osc.start();osc.stop(audioContext.currentTime+.29);
+    $('detail').textContent='Reproduciendo tono de prueba '+label+'.';return true;
+  }catch(err){setTonePlaying(kind,false);$('detail').textContent='Error de audio: '+(err.message||err);return false;}
+}
+[['upSound','up','upName'],['downSound','down','downName'],['sideSound','side','sideName']].forEach(([id,k,nameId])=>$(id).addEventListener('change',e=>{const f=e.target.files[0];if(f){if(audioFiles[k])URL.revokeObjectURL(audioFiles[k]);audioFiles[k]=URL.createObjectURL(f);$(nameId).textContent=f.name;$('detail').textContent='Archivo cargado: '+f.name+'. Podés probarlo.';}}));
+$('testUp').onclick=async()=>{await unlockAudio();await play('up')};$('testDown').onclick=async()=>{await unlockAudio();await play('down')};$('testSide').onclick=async()=>{await unlockAudio();await play('side')};
 window.addEventListener('resize',()=>{if(video.videoWidth)fitOverlay()});video.addEventListener('loadedmetadata',fitOverlay);
 })();
 </script>
