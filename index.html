@@ -45,7 +45,7 @@
 <div class="tone-row"><button class="tone-button tone-down" id="toneDown" type="button"><span class="tone-light"></span>Tono bajista</button><button class="secondary preview-btn" id="testDown" type="button" title="Probar tono bajista">▶ Probar</button><select class="bank-select" id="bankDown" aria-label="Sonido bajista"><option value="">Sin sonido</option></select><span class="file-name" id="downName">Sin sonido seleccionado</span><input type="file" id="downSound" accept="audio/*" hidden></div>
 <div class="tone-row"><button class="tone-button tone-side" id="toneSide" type="button"><span class="tone-light"></span>Tono neutro</button><button class="secondary preview-btn" id="testSide" type="button" title="Probar tono neutro">▶ Probar</button><select class="bank-select" id="bankSide" aria-label="Sonido neutro"><option value="">Sin sonido</option></select><span class="file-name" id="sideName">Sin sonido seleccionado</span><input type="file" id="sideSound" accept="audio/*" hidden></div>
 </div>
-<div class="notice">Elegí un sonido del banco de GraphTune o cargá uno propio tocando el botón de cada tono. Cada categoría es independiente: si elegís «Sin sonido», esa tendencia se analizará normalmente, pero no emitirá audio. El botón se ilumina durante la reproducción.</div>
+<div class="notice">Elegí cualquiera de los audios reales que están guardados en la carpeta sounds de GitHub, o cargá uno propio tocando el botón de cada tono. Cada categoría es independiente: si elegís «Sin sonido», esa tendencia se analizará normalmente, pero no emitirá audio. El botón se ilumina durante la reproducción.</div>
 <div class="notice">Las líneas son estimaciones visuales. No son señales de compra o venta ni predicciones. La detección depende de los colores, el zoom y la calidad de la captura.</div>
 </div>
 </section>
@@ -62,7 +62,24 @@ const video=$('video'), stage=$('stage'), overlay=$('overlay'), ctx=overlay.getC
 const work=$('work'), wctx=work.getContext('2d',{willReadFrequently:true});
 let stream=null, selecting=false, drawing=false, start=null, rect=null, running=false, loop=null, hideLines=false;
 let lastTrend='UNKNOWN', lastAlert=0, audioFiles={up:null,down:null,side:null}, customAudioNames={up:'',down:'',side:''}, lastAnalysis=null;
-const SOUND_BANK=[...Array.from({length:3},(_,i)=>({label:`Alcista ${i+1}`,file:`alcista-0${i+1}.mp3`})),...Array.from({length:3},(_,i)=>({label:`Bajista ${i+1}`,file:`bajista-0${i+1}.mp3`})),...Array.from({length:2},(_,i)=>({label:`Neutro ${i+1}`,file:`neutro-0${i+1}.mp3`})),...Array.from({length:2},(_,i)=>({label:`Alerta ${i+1}`,file:`alerta-0${i+1}.mp3`}))];
+const SOUND_BANK=[
+  {label:'Alert Trumpet — alert-trumpet.mp3',file:'alert-trumpet.mp3'},
+  {label:'Alien Confusion — alien-confusion.mp3',file:'alien-confusion.mp3'},
+  {label:'Aplausos — aplausos.mp3',file:'aplausos.mp3'},
+  {label:'Ba Dum Bum All — ba-dum-bum-all.mp3',file:'ba-dum-bum-all.mp3'},
+  {label:'Risa de bebé — risa-de-bebé.mp3',file:'risa-de-bebé.mp3'},
+  {label:'Danger Alarm Meme — danger-alarm-sound-effect-meme.mp3',file:'danger-alarm-sound-effect-meme.mp3'},
+  {label:'Danger Zone Intro — danger-zone-intro.mp3',file:'danger-zone-intro.mp3'},
+  {label:'Funny Fanfare — funny-fanfare-wav.mp3',file:'funny-fanfare-wav.mp3'},
+  {label:'Is It a Winner — is-it-a-winner.mp3',file:'is-it-a-winner.mp3'},
+  {label:'Trompeta mexicana — trompeta mexicana.mp3',file:'trompeta mexicana.mp3'},
+  {label:'Sad Trumpet — sad-trumpet.mp3',file:'sad-trumpet.mp3'},
+  {label:'SML Danger Sound — sml-danger-sound.mp3',file:'sml-danger-sound.mp3'},
+  {label:'Undertale Sans Trumpet — undertale-sans-trumpet.mp3',file:'undertale-sans-trumpet.mp3'},
+  {label:'Victory Sound — victory-sound.mp3',file:'victory-sound.mp3'},
+  {label:'Señal de advertencia — señal de advertencia.mp3',file:'señal de advertencia.mp3'},
+  {label:'Niño de un año riendo — niño-de-un-año-riendo.mp3',file:'niño-de-un-año-riendo.mp3'}
+];
 const bankSelections={up:$('bankUp'),down:$('bankDown'),side:$('bankSide')};
 const bankPaths={up:'',down:'',side:''};
 for(const [kind,select] of Object.entries(bankSelections)){for(const sound of SOUND_BANK){const option=document.createElement('option');option.value=`sounds/${sound.file}`;option.textContent=`Banco: ${sound.label}`;select.appendChild(option);}select.addEventListener('change',()=>{bankPaths[kind]=select.value;audioFiles[kind]=null;customAudioNames[kind]='';$(kind==='up'?'upName':kind==='down'?'downName':'sideName').textContent=select.value?`Banco: ${select.options[select.selectedIndex].text.replace('Banco: ','')}`:'Sin sonido seleccionado';});}
@@ -118,9 +135,9 @@ async function unlockAudio(){
 async function play(kind){
   if(!$('soundOn').checked){$('detail').textContent='Los sonidos están desactivados.';return false;}
   stopActiveAudio();
+  const label=kind==='up'?'alcista':kind==='down'?'bajista':'neutro';
   const file=audioFiles[kind]||bankPaths[kind];
   if(!file){$('detail').textContent='Sin sonido configurado para '+label+'. El análisis continúa normalmente.';return false;}
-  const label=kind==='up'?'alcista':kind==='down'?'bajista':'neutro';
   if(file){
     try{
       const player=new Audio(file);player.preload='auto';player.volume=.85;
