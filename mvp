@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GraphTune — Análisis visual de mercado</title>
+<style>
+:root{--bg:#080b17;--panel:#11172a;--panel2:#171f36;--line:#293451;--text:#f4f6ff;--muted:#9ba8c5;--purple:#9a5cff;--green:#0ecb81;--red:#f6465d;--yellow:#f5c451}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% -20%,#28204c 0,transparent 38%),var(--bg);color:var(--text);font:15px Inter,Segoe UI,Arial,sans-serif}button,select,input{font:inherit}button{border:0;border-radius:10px;padding:11px 15px;cursor:pointer;font-weight:700}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(110deg,#7b3fe4,#a45dff);color:white}.secondary{background:#252e49;color:#e7eaff;border:1px solid #394666}.danger{background:#492536;color:#ffdce3;border:1px solid #71364b}.wrap{max-width:1450px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}.brand{display:flex;align-items:center;gap:12px}.logo{font-size:32px;color:#bd8aff;text-shadow:0 0 22px #9a5cff}.brand h1{font-size:25px;margin:0}.brand h1 span{color:#bd8aff}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.status{border:1px solid #34415f;background:#131d32;border-radius:30px;padding:8px 12px;color:#cbd5ee;font-size:12px}.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}.card{background:#101629eF;border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 12px 35px #0003}.card h2,.card h3{margin:0 0 13px}.card h2{font-size:17px}.card h3{font-size:15px}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}.stage{position:relative;width:100%;min-height:320px;background:#070a12;border:1px solid #303b57;border-radius:12px;overflow:hidden;display:grid;place-items:center}.stage video{display:block;width:100%;height:auto;max-height:72vh;object-fit:contain}.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}.placeholder{max-width:420px;text-align:center;padding:30px;color:var(--muted);line-height:1.6}.placeholder strong{display:block;color:var(--text);font-size:18px;margin-bottom:8px}.capture{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.hint{font-size:12px;line-height:1.5;color:var(--muted);margin:11px 0 0}.metric{padding:13px;background:var(--panel2);border:1px solid #2b3855;border-radius:12px;margin-bottom:10px}.metric small{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.metric strong{font-size:17px}.state{font-weight:800;letter-spacing:.5px}.state.up{color:var(--green)}.state.down{color:var(--red)}.state.side{color:var(--yellow)}.setting{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #26314a;font-size:13px}.setting:last-child{border:0}.setting select,.setting input{max-width:130px;background:#202a43;color:white;border:1px solid #3a4867;border-radius:8px;padding:7px}.check{display:flex;gap:8px;align-items:center;color:#dbe2f6;font-size:13px;margin:12px 0}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.notice{font-size:12px;line-height:1.55;color:#d9c9ff;background:#241a3a;border:1px solid #49346d;padding:11px;border-radius:10px;margin-top:14px}.footer{color:#77839f;font-size:11px;text-align:center;margin:20px 0 4px}.hidden{display:none!important}
+
+.config-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.config-heading h3{margin:0}.collapse-btn{padding:8px 11px;font-size:12px}.tone-list{display:grid;gap:9px;margin-top:14px}.tone-row{display:grid;grid-template-columns:minmax(125px,1fr) auto;gap:8px;align-items:center;padding:9px;background:#0c1222;border:1px solid #263451;border-radius:12px}.tone-button{display:flex;align-items:center;gap:9px;justify-content:flex-start;text-align:left;background:#202a43;color:#edf1ff;border:1px solid #3a4867;transition:box-shadow .18s,border-color .18s,background .18s}.tone-button:hover{background:#293653}.tone-light{width:9px;height:9px;border-radius:50%;background:#66738e;box-shadow:0 0 0 transparent}.tone-button.playing{background:#263d39;border-color:#21d99a;box-shadow:0 0 8px #21d99a99,0 0 20px #21d99a55}.tone-button.playing .tone-light{background:#35f0a8;box-shadow:0 0 10px #35f0a8,0 0 18px #35f0a8}.tone-button.tone-down.playing{background:#432632;border-color:#ff6379;box-shadow:0 0 8px #ff637999,0 0 20px #ff637955}.tone-button.tone-down.playing .tone-light{background:#ff6379;box-shadow:0 0 10px #ff6379}.tone-button.tone-side.playing{background:#423923;border-color:#f4c75e;box-shadow:0 0 8px #f4c75e99,0 0 20px #f4c75e55}.tone-button.tone-side.playing .tone-light{background:#f4c75e;box-shadow:0 0 10px #f4c75e}.preview-btn{padding:9px 10px;font-size:12px;white-space:nowrap}.file-name{grid-column:1/-1;color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bank-select{grid-column:1/-1;width:100%;background:#202a43;color:white;border:1px solid #3a4867;border-radius:8px;padding:8px}.config-collapsed #configBody{display:none}.config-card{padding:15px}
+
+@media(max-width:900px){.grid{grid-template-columns:1fr}.wrap{padding:14px}.stage{min-height:240px}.top{align-items:flex-start}.status{max-width:145px;text-align:center}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="brand"><div class="logo">◖)))</div><div><h1>Graph<span>Tune</span></h1><p>Escuchá los cambios del mercado</p></div></div><div class="status" id="connection">● Sin pantalla conectada</div></header>
+<div class="grid">
+<section class="card">
+<h2>Gráfico de mercado</h2>
+<div class="toolbar"><button class="primary" id="share">＋ Compartir pantalla</button><button class="secondary" id="select" disabled>Seleccionar zona de precios</button><button class="secondary" id="analyze" disabled>▶ Analizar</button><button class="danger" id="stop" disabled>Detener</button></div>
+<div class="stage" id="stage"><video id="video" autoplay muted playsinline class="hidden"></video><canvas id="overlay" class="hidden"></canvas><div class="placeholder" id="placeholder"><strong>Conectá tu plataforma de trading</strong>Compartí la ventana o pantalla donde está el gráfico. Después seleccioná solamente el área de las velas, sin incluir el volumen de abajo.</div></div>
+<div class="capture"><button class="secondary" id="clearLines" disabled>Limpiar líneas</button><button class="secondary" id="showLines" disabled>Ocultar líneas</button></div>
+<div class="legend"><span><i class="dot" style="background:var(--green)"></i>Vela alcista</span><span><i class="dot" style="background:var(--red)"></i>Vela bajista</span><span><i class="dot" style="background:#b58aff"></i>Línea de máximos</span><span><i class="dot" style="background:#55c8ff"></i>Línea de mínimos</span></div>
+<p class="hint">Consejo: seleccioná únicamente el área donde se dibujan las velas y sus mechas. Evitá incluir volumen, paneles laterales, indicadores y botones.</p>
+</section>
+<aside>
+<section class="card">
+<h2>Lectura de tendencia</h2>
+<div class="metric"><small>ESTRUCTURA DETECTADA</small><strong class="state side" id="trend">ESPERANDO DATOS</strong></div>
+<div class="metric"><small>VELAS RECONOCIDAS</small><strong id="candleCount">0</strong></div>
+<div class="metric"><small>PIVOTES CONFIRMADOS</small><strong id="pivotCount">0</strong></div>
+<div class="metric"><small>ESTADO DEL ANÁLISIS</small><strong id="detail" style="font-size:13px">Compartí y seleccioná un gráfico.</strong></div>
+</section>
+<section class="card config-card" style="margin-top:16px">
+<div class="config-heading"><h3>Configuración</h3><button class="secondary collapse-btn" id="configToggle" aria-expanded="true">Minimizar −</button></div>
+<div id="configBody">
+<div class="setting"><label for="sensitivity">Sensibilidad</label><select id="sensitivity"><option value="1">Alta</option><option value="2" selected>Media</option><option value="3">Baja</option></select></div>
+<div class="setting"><label for="cooldown">Pausa entre alertas</label><select id="cooldown"><option value="2">2 segundos</option><option value="4" selected>4 segundos</option><option value="6">6 segundos</option><option value="10">10 segundos</option></select></div>
+<label class="check"><input type="checkbox" id="soundOn" checked> Activar sonidos</label>
+<label class="check"><input type="checkbox" id="trendAlerts" checked> Avisar al cambiar tendencia</label>
+<div class="tone-list">
+<div class="tone-row"><button class="tone-button tone-up" id="toneUp" type="button"><span class="tone-light"></span>Tono alcista</button><button class="secondary preview-btn" id="testUp" type="button" title="Probar tono alcista">▶ Probar</button><select class="bank-select" id="bankUp" aria-label="Sonido alcista"><option value="">Sin sonido</option></select><span class="file-name" id="upName">Sin sonido seleccionado</span><input type="file" id="upSound" accept="audio/*" hidden></div>
+<div class="tone-row"><button class="tone-button tone-down" id="toneDown" type="button"><span class="tone-light"></span>Tono bajista</button><button class="secondary preview-btn" id="testDown" type="button" title="Probar tono bajista">▶ Probar</button><select class="bank-select" id="bankDown" aria-label="Sonido bajista"><option value="">Sin sonido</option></select><span class="file-name" id="downName">Sin sonido seleccionado</span><input type="file" id="downSound" accept="audio/*" hidden></div>
+<div class="tone-row"><button class="tone-button tone-side" id="toneSide" type="button"><span class="tone-light"></span>Tono neutro</button><button class="secondary preview-btn" id="testSide" type="button" title="Probar tono neutro">▶ Probar</button><select class="bank-select" id="bankSide" aria-label="Sonido neutro"><option value="">Sin sonido</option></select><span class="file-name" id="sideName">Sin sonido seleccionado</span><input type="file" id="sideSound" accept="audio/*" hidden></div>
+</div>
+<div class="notice">Elegí cualquiera de los audios reales que están guardados en la carpeta sounds de GitHub, o cargá uno propio tocando el botón de cada tono. Cada categoría es independiente: si elegís «Sin sonido», esa tendencia se analizará normalmente, pero no emitirá audio. El botón se ilumina durante la reproducción.</div>
+<div class="notice">Las líneas son estimaciones visuales. No son señales de compra o venta ni predicciones. La detección depende de los colores, el zoom y la calidad de la captura.</div>
+</div>
+</section>
+</aside>
+</div>
+<div class="footer">GraphTune · Prototipo experimental de análisis visual</div>
+</div>
+<canvas id="work" class="hidden"></canvas>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const video=$('video'), stage=$('stage'), overlay=$('overlay'), ctx=overlay.getContext('2d');
+const work=$('work'), wctx=work.getContext('2d',{willReadFrequently:true});
+let stream=null, selecting=false, drawing=false, start=null, rect=null, running=false, loop=null, hideLines=false;
+let lastTrend='UNKNOWN', lastAlert=0, audioFiles={up:null,down:null,side:null}, customAudioNames={up:'',down:'',side:''}, lastAnalysis=null;
+const SOUND_BANK=[
+  {label:'Alert Trumpet — alert-trumpet.mp3',file:'alert-trumpet.mp3'},
+  {label:'Alien Confusion — alien-confusion.mp3',file:'alien-confusion.mp3'},
+  {label:'Aplausos — aplausos.mp3',file:'aplausos.mp3'},
+  {label:'Ba Dum Bum All — ba-dum-bum-all.mp3',file:'ba-dum-bum-all.mp3'},
+  {label:'Risa de bebé — risa-de-bebé.mp3',file:'risa-de-bebé.mp3'},
+  {label:'Danger Alarm Meme — danger-alarm-sound-effect-meme.mp3',file:'danger-alarm-sound-effect-meme.mp3'},
+  {label:'Danger Zone Intro — danger-zone-intro.mp3',file:'danger-zone-intro.mp3'},
+  {label:'Funny Fanfare — funny-fanfare-wav.mp3',file:'funny-fanfare-wav.mp3'},
+  {label:'Is It a Winner — is-it-a-winner.mp3',file:'is-it-a-winner.mp3'},
+  {label:'Trompeta mexicana — trompeta mexicana.mp3',file:'trompeta mexicana.mp3'},
+  {label:'Sad Trumpet — sad-trumpet.mp3',file:'sad-trumpet.mp3'},
+  {label:'SML Danger Sound — sml-danger-sound.mp3',file:'sml-danger-sound.mp3'},
+  {label:'Undertale Sans Trumpet — undertale-sans-trumpet.mp3',file:'undertale-sans-trumpet.mp3'},
+  {label:'Victory Sound — victory-sound.mp3',file:'victory-sound.mp3'},
+  {label:'Señal de advertencia — señal de advertencia.mp3',file:'señal de advertencia.mp3'},
+  {label:'Niño de un año riendo — niño-de-un-año-riendo.mp3',file:'niño-de-un-año-riendo.mp3'}
+];
+const bankSelections={up:$('bankUp'),down:$('bankDown'),side:$('bankSide')};
+const bankPaths={up:'',down:'',side:''};
+for(const [kind,select] of Object.entries(bankSelections)){for(const sound of SOUND_BANK){const option=document.createElement('option');option.value=`sounds/${sound.file}`;option.textContent=`Banco: ${sound.label}`;select.appendChild(option);}select.addEventListener('change',()=>{bankPaths[kind]=select.value;audioFiles[kind]=null;customAudioNames[kind]='';$(kind==='up'?'upName':kind==='down'?'downName':'sideName').textContent=select.value?`Banco: ${select.options[select.selectedIndex].text.replace('Banco: ','')}`:'Sin sonido seleccionado';});}
+let audioContext=null, audioUnlocked=false, activeAudio=null, activeTone=null;
+const audioPlayers={up:null,down:null,side:null};
+const toneButtons={up:$('toneUp'),down:$('toneDown'),side:$('toneSide')};
+function setTonePlaying(kind,on){const b=toneButtons[kind];if(b)b.classList.toggle('playing',!!on)}
+function stopActiveAudio(){if(activeAudio){activeAudio.pause();try{activeAudio.currentTime=0}catch(e){}activeAudio=null}if(activeTone){setTonePlaying(activeTone,false);activeTone=null}}
+const colors={up:'#b58aff',down:'#55c8ff'};
+function status(s){$('connection').textContent=s}
+function fitOverlay(){if(!video.videoWidth)return;const r=video.getBoundingClientRect();overlay.width=video.videoWidth;overlay.height=video.videoHeight;overlay.style.width=r.width+'px';overlay.style.height=r.height+'px';overlay.style.left=(video.offsetLeft)+'px';overlay.style.top=(video.offsetTop)+'px';drawOverlay()}
+function pointerPos(e){const r=overlay.getBoundingClientRect();return {x:(e.clientX-r.left)*overlay.width/r.width,y:(e.clientY-r.top)*overlay.height/r.height}}
+$('share').onclick=async()=>{try{stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:30},audio:false});video.srcObject=stream;video.classList.remove('hidden');$('placeholder').classList.add('hidden');await video.play();status('● Pantalla conectada');$('select').disabled=false;stream.getVideoTracks()[0].addEventListener('ended',stopAll);fitOverlay();}catch(e){status('No se pudo compartir');alert('No se pudo iniciar la captura. Revisá los permisos del navegador.')}};
+$('select').onclick=()=>{if(!stream)return;selecting=true;rect=null;stopAnalysis();overlay.classList.remove('hidden');overlay.style.cursor='crosshair';$('detail').textContent='Arrastrá para seleccionar el área de las velas.';drawOverlay()};
+overlay.addEventListener('pointerdown',e=>{if(!selecting)return;drawing=true;start=pointerPos(e);rect={x:start.x,y:start.y,w:0,h:0};overlay.setPointerCapture(e.pointerId);drawOverlay()});
+overlay.addEventListener('pointermove',e=>{if(!drawing)return;const p=pointerPos(e);rect={x:Math.min(start.x,p.x),y:Math.min(start.y,p.y),w:Math.abs(p.x-start.x),h:Math.abs(p.y-start.y)};drawOverlay()});
+overlay.addEventListener('pointerup',()=>{if(!drawing)return;drawing=false;selecting=false;overlay.style.cursor='default';if(!rect||rect.w<40||rect.h<40){rect=null;$('detail').textContent='Selección demasiado pequeña. Intentá de nuevo.';return} $('analyze').disabled=false;$('clearLines').disabled=false;$('showLines').disabled=false;$('detail').textContent='Zona seleccionada. Ya podés analizar.';drawOverlay()});
+function drawOverlay(){if(!overlay.width)return;ctx.clearRect(0,0,overlay.width,overlay.height);if(rect){ctx.save();ctx.strokeStyle='#a66aff';ctx.lineWidth=Math.max(2,overlay.width/900);ctx.setLineDash([8,5]);ctx.strokeRect(rect.x,rect.y,rect.w,rect.h);ctx.fillStyle='#9a5cff20';ctx.fillRect(rect.x,rect.y,rect.w,rect.h);ctx.restore()}if(lastAnalysis&&!hideLines)drawTrendLines(lastAnalysis)}
+function stopAnalysis(){running=false;if(loop)clearInterval(loop);loop=null;stopActiveAudio();$('analyze').disabled=!rect;$('stop').disabled=true}
+function stopAll(){stopAnalysis();if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}video.srcObject=null;video.classList.add('hidden');overlay.classList.add('hidden');$('placeholder').classList.remove('hidden');$('select').disabled=true;$('analyze').disabled=true;status('● Sin pantalla conectada');rect=null;lastAnalysis=null;lastTrend='UNKNOWN';$('trend').textContent='ESPERANDO DATOS';$('trend').className='state side';$('detail').textContent='Compartí y seleccioná un gráfico.';$('candleCount').textContent='0';$('pivotCount').textContent='0'}
+$('stop').onclick=stopAnalysis;
+$('soundOn').addEventListener('change',()=>{if(!$('soundOn').checked)stopActiveAudio();$('detail').textContent=$('soundOn').checked?'Sonidos activados.':'Sonidos desactivados.';});
+$('configToggle').onclick=()=>{const collapsed=$('configBody').classList.toggle('hidden');$('configToggle').textContent=collapsed?'Mostrar configuración +':'Minimizar −';$('configToggle').setAttribute('aria-expanded',String(!collapsed));};
+$('toneUp').onclick=()=>$('upSound').click();$('toneDown').onclick=()=>$('downSound').click();$('toneSide').onclick=()=>$('sideSound').click();
+$('clearLines').onclick=()=>{lastAnalysis=null;drawOverlay();$('trend').textContent='LÍNEAS LIMPIADAS'};
+$('showLines').onclick=()=>{hideLines=!hideLines;$('showLines').textContent=hideLines?'Mostrar líneas':'Ocultar líneas';drawOverlay()};
+$('analyze').onclick=async()=>{if(!rect||!video.videoWidth)return;await unlockAudio();running=true;$('analyze').disabled=true;$('stop').disabled=false;$('detail').textContent='Analizando velas…';lastTrend='UNKNOWN';analyzeFrame();loop=setInterval(analyzeFrame,900)};
+function isGreen(r,g,b){return g>r*1.18&&g>b*0.92&&g>75&&g-r>28}
+function isRed(r,g,b){return r>g*1.35&&r>b*1.08&&r>90&&r-g>35}
+function detectCandles(img){const {data,width,height}=img;const cols=new Array(width).fill(null).map(()=>({n:0,green:0,red:0,ys:[]}));
+// Muestreo de color: trabaja exclusivamente dentro de la región de precio seleccionada.
+for(let y=0;y<height;y+=1){for(let x=0;x<width;x+=1){const i=(y*width+x)*4,r=data[i],g=data[i+1],b=data[i+2];if(isGreen(r,g,b)||isRed(r,g,b)){const c=cols[x];c.n++;if(isGreen(r,g,b))c.green++;else c.red++;c.ys.push(y)}}}
+// Agrupa columnas contiguas de color en una vela; tolera pequeños huecos del cuerpo/mecha.
+let runs=[],active=null,gap=0;for(let x=0;x<width;x++){if(cols[x].n>=1){if(!active)active={x0:x,x1:x,green:0,red:0,ys:[],pixels:0};active.x1=x;active.green+=cols[x].green;active.red+=cols[x].red;active.ys.push(...cols[x].ys);active.pixels+=cols[x].n;gap=0}else if(active&&gap<2){gap++}else if(active){runs.push(active);active=null;gap=0}}if(active)runs.push(active);
+const minHeight=Math.max(4,Math.round(height*.018));return runs.filter(c=>c.pixels>=3&&c.ys.length&&Math.max(...c.ys)-Math.min(...c.ys)>=minHeight).map(c=>({x:(c.x0+c.x1)/2,high:Math.min(...c.ys),low:Math.max(...c.ys),bull:c.green>=c.red,weight:c.pixels})).sort((a,b)=>a.x-b.x)}
+function pivots(candles,kind){const sens=Number($('sensitivity').value),radius=sens===1?2:sens===2?3:4,found=[];for(let i=radius;i<candles.length-radius;i++){const v=kind==='high'?candles[i].high:candles[i].low;let extreme=true,localRange=0;for(let j=i-radius;j<=i+radius;j++){if(j===i)continue;const q=kind==='high'?candles[j].high:candles[j].low;if(kind==='high'&&q<v)extreme=false;if(kind==='low'&&q>v)extreme=false;localRange=Math.max(localRange,Math.abs(q-v))}if(extreme&&localRange>=Math.max(2,rect.h*.012)){const prev=found[found.length-1];if(!prev||i-prev.i>=radius){found.push({i,x:candles[i].x,y:v})}else{const old=prev.y;if((kind==='high'&&v<old)||(kind==='low'&&v>old))found[found.length-1]={i,x:candles[i].x,y:v}}}}return found}
+function classify(highs,lows){if(highs.length<2||lows.length<2)return 'UNKNOWN';const h1=highs.at(-2).y,h2=highs.at(-1).y,l1=lows.at(-2).y,l2=lows.at(-1).y;const eps=rect.h*.012;const higherHigh=h2<h1-eps,higherLow=l2<l1-eps,lowerHigh=h2>h1+eps,lowerLow=l2>l1+eps;if(higherHigh&&higherLow)return 'UP';if(lowerHigh&&lowerLow)return 'DOWN';return 'SIDE'}
+function analyzeFrame(){if(!running||!rect||video.readyState<2)return;try{work.width=Math.max(1,Math.floor(rect.w));work.height=Math.max(1,Math.floor(rect.h));wctx.drawImage(video,rect.x,rect.y,rect.w,rect.h,0,0,work.width,work.height);const img=wctx.getImageData(0,0,work.width,work.height);const candles=detectCandles(img);const highs=pivots(candles,'high'),lows=pivots(candles,'low');const trend=classify(highs,lows);lastAnalysis={highs,lows,trend,rect:{...rect},width:work.width,height:work.height};$('candleCount').textContent=String(candles.length);$('pivotCount').textContent=String(highs.length+lows.length);const labels={UP:'TENDENCIA ASCENDENTE',DOWN:'TENDENCIA DESCENDENTE',SIDE:'TENDENCIA LATERAL',UNKNOWN:'DATOS INSUFICIENTES'};$('trend').textContent=labels[trend];$('trend').className='state '+(trend==='UP'?'up':trend==='DOWN'?'down':'side');$('detail').textContent=candles.length<8?'No se reconocen suficientes velas. Revisá la selección y los colores.':highs.length<2||lows.length<2?'Buscando más máximos y mínimos confirmados.':'Estructura actualizada. Revisá visualmente los pivotes.';if(trend!=='UNKNOWN'&&lastTrend!=='UNKNOWN'&&trend!==lastTrend&&$('trendAlerts').checked)alertTrend(trend);if(trend!=='UNKNOWN')lastTrend=trend;drawOverlay()}catch(e){$('detail').textContent='No se pudo leer la selección. Probá seleccionar nuevamente.';console.error(e)}}
+function line(ctx2,pts,color){if(pts.length<2)return;const a=pts.at(-2),b=pts.at(-1);const dx=b.x-a.x;if(Math.abs(dx)<1)return;const slope=(b.y-a.y)/dx;const endX=overlay.width;const endY=b.y+slope*(endX-b.x);ctx2.save();ctx2.strokeStyle=color;ctx2.lineWidth=Math.max(2,overlay.width/650);ctx2.shadowColor=color;ctx2.shadowBlur=8;ctx2.beginPath();ctx2.moveTo(rect.x+a.x,rect.y+a.y);ctx2.lineTo(rect.x+b.x,rect.y+b.y);ctx2.lineTo(Math.min(overlay.width,rect.x+endX),rect.y+endY);ctx2.stroke();ctx2.fillStyle=color;for(const p of [a,b]){ctx2.beginPath();ctx2.arc(rect.x+p.x,rect.y+p.y,4,0,Math.PI*2);ctx2.fill()}ctx2.restore()}
+function drawTrendLines(a){if(!a||!rect)return;line(ctx,a.highs,colors.up);line(ctx,a.lows,colors.down)}
+function alertTrend(t){const now=Date.now(),cool=Number($('cooldown').value)*1000;if(now-lastAlert<cool)return;lastAlert=now;play(t==='UP'?'up':t==='DOWN'?'down':'side')}
+async function unlockAudio(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC){$('detail').textContent='Este navegador no permite generar audio.';return false;}
+    if(!audioContext)audioContext=new AC();
+    if(audioContext.state==='suspended')await audioContext.resume();
+    audioUnlocked=audioContext.state==='running';
+    if(!audioUnlocked)$('detail').textContent='Chrome todavía no habilitó el audio. Volvé a tocar Probar sonido.';
+    return audioUnlocked;
+  }catch(err){$('detail').textContent='No se pudo habilitar el audio: '+(err.message||err);return false;}
+}
+async function play(kind){
+  if(!$('soundOn').checked){$('detail').textContent='Los sonidos están desactivados.';return false;}
+  stopActiveAudio();
+  const label=kind==='up'?'alcista':kind==='down'?'bajista':'neutro';
+  const file=audioFiles[kind]||bankPaths[kind];
+  if(!file){$('detail').textContent='Sin sonido configurado para '+label+'. El análisis continúa normalmente.';return false;}
+  if(file){
+    try{
+      const player=new Audio(file);player.preload='auto';player.volume=.85;
+      activeAudio=player;activeTone=kind;setTonePlaying(kind,true);
+      player.addEventListener('ended',()=>{if(activeAudio===player){setTonePlaying(kind,false);activeAudio=null;activeTone=null;}},{once:true});
+      player.addEventListener('error',()=>{if(activeAudio===player){setTonePlaying(kind,false);activeAudio=null;activeTone=null;}$('detail').textContent='No se pudo reproducir el archivo. Probá con MP3 o WAV.';},{once:true});
+      await player.play();$('detail').textContent='Reproduciendo tono '+label+'.';return true;
+    }catch(err){setTonePlaying(kind,false);activeAudio=null;activeTone=null;$('detail').textContent='No se pudo reproducir el archivo: '+(err.message||err);return false;}
+  }
+  return false;
+}
+[['upSound','up','upName'],['downSound','down','downName'],['sideSound','side','sideName']].forEach(([id,k,nameId])=>$(id).addEventListener('change',e=>{const f=e.target.files[0];if(f){if(audioFiles[k])URL.revokeObjectURL(audioFiles[k]);audioFiles[k]=URL.createObjectURL(f);bankPaths[k]='';bankSelections[k].value='';$(nameId).textContent='Archivo propio: '+f.name;$('detail').textContent='Archivo cargado: '+f.name+'. Podés probarlo.';}}));
+$('testUp').onclick=async()=>{await unlockAudio();await play('up')};$('testDown').onclick=async()=>{await unlockAudio();await play('down')};$('testSide').onclick=async()=>{await unlockAudio();await play('side')};
+window.addEventListener('resize',()=>{if(video.videoWidth)fitOverlay()});video.addEventListener('loadedmetadata',fitOverlay);
+})();
+</script>
+</body>
+</html>
